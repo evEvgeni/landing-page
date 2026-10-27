@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Евгений — AI agentic engineer</title>
+  <meta name="description" content="Проектирую автономных ИИ-агентов, которые доводят задачи до результата.">
+  <meta name="theme-color" content="#dc0000">
+  <script>document.documentElement.classList.add('js')</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+
+  <main>
+    <!-- Секция 1 -->
+    <section class="section hero" data-theme="rosso" id="hero">
+      <div class="hero__bg" aria-hidden="true"><i></i><i></i></div>
+      <div class="hero__text">
+        <h1 class="hero__title">
+          <span class="line"><span>Привет! Я Евгений —</span></span>
+          <span class="line"><span>AI agentic engineer</span></span>
+        </h1>
+        <h2 class="hero__sub" data-reveal>Проектирую автономных ИИ-агентов, которые доводят задачи до результата</h2>
+        <div class="actions" data-reveal>
+          <a class="btn" href="mailto:hello@example.com">Связаться со мной</a>
+          <a class="link-next" href="#projects">Мои проекты</a>
+        </div>
+      </div>
+
+      <!-- Тематическое изображение: сеть ИИ-агентов, которая работает: задачи летят от оркестратора к агентам и обратно -->
+      <svg class="net" viewBox="0 0 520 520" role="img" aria-label="Сеть ИИ-агентов: оркестратор раздаёт задачи поиску, данным, коду, почте, безопасности и аналитике" data-net>
+        <g class="links" fill="none" stroke-linecap="round">
+          <path class="link weak" pathLength="1" d="M260.0 75.0 L420.2 167.5"/>
+          <path class="link weak" pathLength="1" d="M420.2 167.5 L420.2 352.5"/>
+          <path class="link weak" pathLength="1" d="M420.2 352.5 L260.0 445.0"/>
+          <path class="link weak" pathLength="1" d="M260.0 445.0 L99.8 352.5"/>
+          <path class="link weak" pathLength="1" d="M99.8 352.5 L99.8 167.5"/>
+          <path class="link weak" pathLength="1" d="M99.8 167.5 L260.0 75.0"/>
+          <path class="link" data-i="0" pathLength="1" style="--n:0" d="M260 260 L260.0 75.0"/>
+          <path class="link" data-i="1" pathLength="1" style="--n:1" d="M260 260 L420.2 167.5"/>
+          <path class="link" data-i="2" pathLength="1" style="--n:2" d="M260 260 L420.2 352.5"/>
+          <path class="link" data-i="3" pathLength="1" style="--n:3" d="M260 260 L260.0 445.0"/>
+          <path class="link" data-i="4" pathLength="1" style="--n:4" d="M260 260 L99.8 352.5"/>
+          <path class="link" data-i="5" pathLength="1" style="--n:5" d="M260 260 L99.8 167.5"/>
+        </g>
+        <g class="packets"></g>
+        <g class="node" data-i="0" data-x="260.0" data-y="75.0" data-state="idle" data-work="Ищу в базе" data-done="12 источников" style="--n:0">
+          <g class="node__body">
+            <circle class="node__ring" cx="260.0" cy="75.0" r="43"/>
+            <circle class="node__bg" cx="260.0" cy="75.0" r="34"/>
+            <g class="node__icon" transform="translate(247.0 62.0) scale(1.083)"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></g>
+            <g class="node__badge"><circle cx="285.0" cy="50.0" r="11"/><path d="m280.0 50.0 3.5 3.5 6-7"/></g>
+          </g>
+          <text class="node__label" x="260.0" y="23.0"></text>
+        </g>
+        <g class="node" data-i="1" data-x="420.2" data-y="167.5" data-state="idle" data-work="Сверяю заказ" data-done="Заказ найден" style="--n:1">
+          <g class="node__body">
+            <circle class="node__ring" cx="420.2" cy="167.5" r="43"/>
+            <circle class="node__bg" cx="420.2" cy="167.5" r="34"/>
+            <g class="node__icon" transform="translate(407.2 154.5) scale(1.083)"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></g>
+            <g class="node__badge"><circle cx="445.2" cy="142.5" r="11"/><path d="m440.2 142.5 3.5 3.5 6-7"/></g>
+          </g>
+          <text class="node__label" x="420.2" y="115.5"></text>
+        </g>
+        <g class="node" data-i="2" data-x="420.2" data-y="352.5" data-state="idle" data-work="Пишу тесты" data-done="Тесты пройдены" style="--n:2">
+          <g class="node__body">
+            <circle class="node__ring" cx="420.2" cy="352.5" r="43"/>
+            <circle class="node__bg" cx="420.2" cy="352.5" r="34"/>
+            <g class="node__icon" transform="translate(407.2 339.5) scale(1.083)"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/></g>
+            <g class="node__badge"><circle cx="445.2" cy="327.5" r="11"/><path d="m440.2 327.5 3.5 3.5 6-7"/></g>
+          </g>
+          <text class="node__label" x="420.2" y="412.5"></text>
+        </g>
+        <g class="node" data-i="3" data-x="260.0" data-y="445.0" data-state="idle" data-work="Готовлю ответ" data-done="Ответ отправлен" style="--n:3">
+          <g class="node__body">
+            <circle class="node__ring" cx="260.0" cy="445.0" r="43"/>
+            <circle class="node__bg" cx="260.0" cy="445.0" r="34"/>
+            <g class="node__icon" transform="translate(247.0 432.0) scale(1.083)"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></g>
+            <g class="node__badge"><circle cx="285.0" cy="420.0" r="11"/><path d="m280.0 420.0 3.5 3.5 6-7"/></g>
+          </g>
+          <text class="node__label" x="260.0" y="505.0"></text>
+        </g>
+        <g class="node" data-i="4" data-x="99.8" data-y="352.5" data-state="idle" data-work="Проверяю риски" data-done="Проблем нет" style="--n:4">
+          <g class="node__body">
+            <circle class="node__ring" cx="99.8" cy="352.5" r="43"/>
+            <circle class="node__bg" cx="99.8" cy="352.5" r="34"/>
+            <g class="node__icon" transform="translate(86.8 339.5) scale(1.083)"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></g>
+            <g class="node__badge"><circle cx="124.8" cy="327.5" r="11"/><path d="m119.8 327.5 3.5 3.5 6-7"/></g>
+          </g>
+          <text class="node__label" x="99.8" y="412.5"></text>
+        </g>
+        <g class="node" data-i="5" data-x="99.8" data-y="167.5" data-state="idle" data-work="Считаю метрики" data-done="Отчёт готов" style="--n:5">
+          <g class="node__body">
+            <circle class="node__ring" cx="99.8" cy="167.5" r="43"/>
+            <circle class="node__bg" cx="99.8" cy="167.5" r="34"/>
+            <g class="node__icon" transform="translate(86.8 154.5) scale(1.083)"><path d="M5 20v-8M12 20V5M19 20v-11"/></g>
+            <g class="node__badge"><circle cx="124.8" cy="142.5" r="11"/><path d="m119.8 142.5 3.5 3.5 6-7"/></g>
+          </g>
+          <text class="node__label" x="99.8" y="115.5"></text>
+        </g>
+        <g class="core-group">
+          <circle class="core-ring" cx="260" cy="260" r="60"/>
+          <circle class="core" cx="260" cy="260" r="52"/>
+          <g class="core-icon" transform="translate(233.6 233.6) scale(2.2)"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></g>
+        </g>
+      </svg>
+    </section>
+
+    <!-- Секция 2: сюда вы добавите свои проекты -->
+    <section class="section projects" data-theme="ink" id="projects">
+      <header class="projects__head">
+        <h2 class="projects__title" data-reveal>Проекты</h2>
+        <p class="projects__intro" data-reveal>Агенты, которые работают в продакшене и экономят часы ручной работы.</p>
+      </header>
+
+      <div class="project-list">
+        <a class="project" href="https://github.com/your-name/support-agent" data-reveal>
+          <span class="project__body">
+            <h3 class="project__name">Support Agent</h3>
+            <p class="project__text">Мультиагентная служба поддержки: классифицирует обращения, ищет ответ в базе знаний и закрывает до 70% запросов без участия человека.</p>
+            <span class="project__stack">Python · LangGraph · Postgres</span>
+          </span>
+          <span class="project__go" aria-hidden="true"></span>
+        </a>
+
+        <a class="project" href="https://github.com/your-name/review-agent" data-reveal>
+          <span class="project__body">
+            <h3 class="project__name">Review Agent</h3>
+            <p class="project__text">Проверяет pull request'ы: находит ошибки и уязвимости, пишет комментарии и предлагает готовые исправления.</p>
+            <span class="project__stack">TypeScript · GitHub API · Claude</span>
+          </span>
+          <span class="project__go" aria-hidden="true"></span>
+        </a>
+
+        <a class="project" href="https://github.com/your-name/research-crew" data-reveal>
+          <span class="project__body">
+            <h3 class="project__name">Research Crew</h3>
+            <p class="project__text">Команда агентов собирает источники, сверяет факты и за несколько минут готовит отчёт со ссылками.</p>
+            <span class="project__stack">Python · Web search · RAG</span>
+          </span>
+          <span class="project__go" aria-hidden="true"></span>
+        </a>
+
+        <a class="project" href="https://github.com/your-name/ops-autopilot" data-reveal>
+          <span class="project__body">
+            <h3 class="project__name">Ops Autopilot</h3>
+            <p class="project__text">Следит за логами, находит причину сбоя, открывает тикет и при необходимости откатывает релиз.</p>
+            <span class="project__stack">Go · Kubernetes · MCP</span>
+          </span>
+          <span class="project__go" aria-hidden="true"></span>
+        </a>
+      </div>
+    </section>
+
+    <!--
+      Новая секция = копия блока ниже. Стили темы подхватятся сами.
+      data-theme: rosso | ink | paper
+      <section class="section" data-theme="ink" id="projects">
+        <h2 class="section__title" data-reveal>Проекты</h2>
+        ...
+      </section>
+    -->
+  </main>
+
+  <footer class="footer" data-theme="rosso" id="contacts">
+    <div class="footer__main">
+      <div>
+        <h2 class="footer__title" data-reveal>Есть задача для ИИ&#8209;агента?</h2>
+        <p class="footer__text" data-reveal>Расскажите, что нужно автоматизировать, и я отвечу в течение дня.</p>
+      </div>
+      <ul class="footer__links" data-reveal>
+        <li><a class="link-next" href="mailto:hello@example.com">hello@example.com</a></li>
+        <li><a class="link-next" href="https://t.me/your_name">Telegram</a></li>
+        <li><a class="link-next" href="https://github.com/your-name">GitHub</a></li>
+        <li><a class="link-next" href="https://www.linkedin.com/in/your-name">LinkedIn</a></li>
+      </ul>
+    </div>
+    <p class="footer__copy">© <span data-year>2026</span> Евгений. Все права защищены.</p>
+  </footer>
+</body>
+</html>
