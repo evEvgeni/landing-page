@@ -64,7 +64,8 @@ if (net) {
       say(n, 'work'); await wait(rand(1500, 2600));
       say(n, 'done');
       await fly(n, core, 650);
-      coreDot.classList.remove('bump'); void coreDot.getBBox(); coreDot.classList.add('bump');
+      // getBoundingClientRect перезапускает анимацию и не падает, когда граф скрыт на мобильных
+      coreDot.classList.remove('bump'); void coreDot.getBoundingClientRect(); coreDot.classList.add('bump');
       await wait(1500);
       say(n, 'idle'); n.link.classList.remove('on'); n.busy = false;
     };

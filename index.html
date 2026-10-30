@@ -7,9 +7,7 @@
   <meta name="description" content="Проектирую автономных ИИ-агентов, которые доводят задачи до результата.">
   <meta name="theme-color" content="#dc0000">
   <script>document.documentElement.classList.add('js')</script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
@@ -22,13 +20,13 @@
       <div class="hero__bg" aria-hidden="true"><i></i><i></i></div>
       <div class="hero__text">
         <h1 class="hero__title">
-          <span class="line"><span>Привет! Я Евгений —</span></span>
+          <span class="line"><span>Евгений Шварц</span></span>
           <span class="line"><span>AI agentic engineer</span></span>
         </h1>
-        <h2 class="hero__sub" data-reveal>Проектирую автономных ИИ-агентов, которые доводят задачи до результата</h2>
+        <h2 class="hero__sub" data-reveal>Проектирую ИИ-агентов, которые доводят задачи до результата</h2>
         <div class="actions" data-reveal>
           <a class="btn" href="mailto:hello@example.com">Связаться со мной</a>
-          <a class="link-next" href="#projects">Мои проекты</a>
+          <a class="btn btn--light" href="#projects">Мои проекты</a>
         </div>
       </div>
 
@@ -111,60 +109,93 @@
       </svg>
     </section>
 
-    <!-- Секция 2: сюда вы добавите свои проекты -->
+    <!-- Секция 2 -->
     <section class="section projects" data-theme="ink" id="projects">
-      <header class="projects__head">
-        <h2 class="projects__title" data-reveal>Проекты</h2>
-        <p class="projects__intro" data-reveal>Агенты, которые работают в продакшене и экономят часы ручной работы.</p>
-      </header>
+      <div class="container">
+        <header class="projects__head">
+          <h2 class="projects__title" data-reveal>Проекты</h2>
+          <p class="projects__intro" data-reveal>Агенты, которые работают в продакшене и экономят часы ручной работы.</p>
+        </header>
 
-      <div class="project-list">
-        <a class="project" href="https://github.com/your-name/support-agent" data-reveal>
-          <span class="project__body">
-            <h3 class="project__name">Support Agent</h3>
-            <p class="project__text">Мультиагентная служба поддержки: классифицирует обращения, ищет ответ в базе знаний и закрывает до 70% запросов без участия человека.</p>
-            <span class="project__stack">Python · LangGraph · Postgres</span>
-          </span>
-          <span class="project__go" aria-hidden="true"></span>
-        </a>
+        <div class="project-list">
+          <a class="project" href="https://github.com/your-name/support-agent" data-reveal>
+            <div class="project__top">
+              <div class="project__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg>
+              </div>
+              <span class="project__num">01</span>
+            </div>
+            <div class="project__body">
+              <h3 class="project__name">Support Agent</h3>
+              <div class="project__more">
+                <p class="project__text">Мультиагентная служба поддержки: классифицирует обращения, ищет ответ в базе знаний и закрывает до 70% запросов без участия человека.</p>
+                <div class="project__foot">
+                  <span class="project__stack">Python · LangGraph · Postgres</span>
+                  <span class="project__go" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+          </a>
 
-        <a class="project" href="https://github.com/your-name/review-agent" data-reveal>
-          <span class="project__body">
-            <h3 class="project__name">Review Agent</h3>
-            <p class="project__text">Проверяет pull request'ы: находит ошибки и уязвимости, пишет комментарии и предлагает готовые исправления.</p>
-            <span class="project__stack">TypeScript · GitHub API · Claude</span>
-          </span>
-          <span class="project__go" aria-hidden="true"></span>
-        </a>
+          <a class="project" href="https://github.com/your-name/review-agent" data-reveal>
+            <div class="project__top">
+              <div class="project__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/></svg>
+              </div>
+              <span class="project__num">02</span>
+            </div>
+            <div class="project__body">
+              <h3 class="project__name">Review Agent</h3>
+              <div class="project__more">
+                <p class="project__text">Проверяет pull request'ы: находит ошибки и уязвимости, пишет комментарии и предлагает готовые исправления.</p>
+                <div class="project__foot">
+                  <span class="project__stack">TypeScript · GitHub API · Claude</span>
+                  <span class="project__go" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+          </a>
 
-        <a class="project" href="https://github.com/your-name/research-crew" data-reveal>
-          <span class="project__body">
-            <h3 class="project__name">Research Crew</h3>
-            <p class="project__text">Команда агентов собирает источники, сверяет факты и за несколько минут готовит отчёт со ссылками.</p>
-            <span class="project__stack">Python · Web search · RAG</span>
-          </span>
-          <span class="project__go" aria-hidden="true"></span>
-        </a>
+          <a class="project" href="https://github.com/your-name/research-crew" data-reveal>
+            <div class="project__top">
+              <div class="project__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              </div>
+              <span class="project__num">03</span>
+            </div>
+            <div class="project__body">
+              <h3 class="project__name">Research Crew</h3>
+              <div class="project__more">
+                <p class="project__text">Команда агентов собирает источники, сверяет факты и за несколько минут готовит отчёт со ссылками.</p>
+                <div class="project__foot">
+                  <span class="project__stack">Python · Web search · RAG</span>
+                  <span class="project__go" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+          </a>
 
-        <a class="project" href="https://github.com/your-name/ops-autopilot" data-reveal>
-          <span class="project__body">
-            <h3 class="project__name">Ops Autopilot</h3>
-            <p class="project__text">Следит за логами, находит причину сбоя, открывает тикет и при необходимости откатывает релиз.</p>
-            <span class="project__stack">Go · Kubernetes · MCP</span>
-          </span>
-          <span class="project__go" aria-hidden="true"></span>
-        </a>
+          <a class="project" href="https://github.com/your-name/ops-autopilot" data-reveal>
+            <div class="project__top">
+              <div class="project__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+              </div>
+              <span class="project__num">04</span>
+            </div>
+            <div class="project__body">
+              <h3 class="project__name">Ops Autopilot</h3>
+              <div class="project__more">
+                <p class="project__text">Следит за логами, находит причину сбоя, открывает тикет и при необходимости откатывает релиз.</p>
+                <div class="project__foot">
+                  <span class="project__stack">Go · Kubernetes · MCP</span>
+                  <span class="project__go" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
       </div>
     </section>
-
-    <!--
-      Новая секция = копия блока ниже. Стили темы подхватятся сами.
-      data-theme: rosso | ink | paper
-      <section class="section" data-theme="ink" id="projects">
-        <h2 class="section__title" data-reveal>Проекты</h2>
-        ...
-      </section>
-    -->
   </main>
 
   <footer class="footer" data-theme="rosso" id="contacts">
