@@ -9,7 +9,7 @@
     --ink: #181818;
     --paper: #f7f7f5;
 
-    --font: "Archivo", system-ui, sans-serif;
+    --font: "Archivo", "Cyr", system-ui, sans-serif;
     /* Всего два стиля: display — узкий жирный (заголовки), text — обычный (всё остальное) */
     --display-stretch: 65%;
     --text-stretch: 100%;
@@ -28,6 +28,10 @@
   [data-theme="rosso"] { --bg: var(--rosso); --fg: #fff;        --accent: var(--giallo); --on-accent: var(--ink); --glow: rgb(255 255 255 / .16); }
   [data-theme="ink"]   { --bg: var(--ink);   --fg: #fff;        --accent: var(--rosso);  --on-accent: #fff;       --glow: rgb(220 0 0 / .28); }
   [data-theme="paper"] { --bg: var(--paper); --fg: var(--ink);  --accent: var(--rosso);  --on-accent: #fff;       --glow: rgb(220 0 0 / .10); }
+  /* Насколько темнеет угол фона секции — как тень на первом экране */
+  [data-theme="rosso"] { --shade: rgb(0 0 0 / .28); }
+  [data-theme="ink"]   { --shade: rgb(0 0 0 / .45); }
+  [data-theme="paper"] { --shade: rgb(24 24 24 / .05); }
 }
 
 /* Шрифт лежит в проекте: страница не зависит от Google Fonts и выглядит одинаково везде */
@@ -49,10 +53,44 @@
   src: url("fonts/archivo-latin-ext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
+/* В Archivo нет кириллицы — браузер берёт её из следующего в списке семейства «Cyr».
+   В нём два файла, и нужный выбирается по font-stretch: узкий display-стиль (65%) — Sofia Sans Extra Condensed,
+   обычный текст (100%) — Roboto Flex */
+@font-face {
+  font-family: "Cyr";
+  font-style: normal;
+  font-weight: 1 1000;
+  font-stretch: 50% 74%;
+  font-display: swap;
+  src: url("fonts/sofiasans-xcond-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Cyr";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-stretch: 75% 151%;
+  font-display: swap;
+  src: url("fonts/robotoflex-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
 /* ---------- 2. База ---------- */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; margin: 0; }
   html { scroll-behavior: smooth; color-scheme: dark; }
+  /* Пока идёт прелоадер, страница не прокручивается */
+  .is-loading, .is-loading body { overflow: hidden; }
+  /* Свой курсор заменяет системный */
+  .has-cursor, .has-cursor * { cursor: none !important; }
+  /* Фокус, перенесённый скриптом в секцию после перехода, не рисует рамку */
+  [tabindex="-1"]:focus { outline: none; }
+  kbd {
+    font: 600 .85em/1 ui-monospace, "Cascadia Code", Consolas, monospace;
+    padding: .2em .45em;
+    border: 1px solid currentColor;
+    border-radius: .35em;
+    opacity: .8;
+  }
   body {
     font-family: var(--font);
     font-size: var(--step-0);
@@ -70,21 +108,17 @@
 /* ---------- 3. Макет: общий каркас любой секции ---------- */
 @layer layout {
   .section {
-    --mx: 50%; --my: 50%;
     position: relative;
     isolation: isolate;
     min-height: 100svh;
     padding: var(--section-space) var(--gutter);
-    background: var(--bg);
+    /* Цвет темы с лёгким диагональным градиентом: светлее справа вверху, темнее слева внизу */
+    background:
+      linear-gradient(200deg, var(--glow) 0%, transparent 55%),
+      linear-gradient(20deg, var(--shade) 0%, transparent 55%),
+      var(--bg);
     color: var(--fg);
     overflow: clip;
-  }
-  /* Свет следует за курсором — работает в каждой секции автоматически */
-  .section::before {
-    content: "";
-    position: absolute; inset: 0; z-index: -1;
-    background: radial-gradient(38rem circle at var(--mx) var(--my), var(--glow), transparent 70%);
-    pointer-events: none;
   }
   .section__title {
     font-size: var(--step-hero);
@@ -120,9 +154,9 @@
     border-radius: 50% 50% 0 0 / 100% 100% 0 0;
     transition: transform .5s var(--ease), border-radius .5s var(--ease);
   }
-  .btn:hover, .btn:focus-visible { color: var(--on-accent); transform: translateY(-2px); }
+  .btn:hover, .btn:focus-visible { color: var(--on-accent); }
   .btn:hover::before, .btn:focus-visible::before { transform: translateY(0); border-radius: 0; }
-  .btn:active { transform: translateY(0) scale(.97); }
+  .btn:active { transform: scale(.97); }
 
   /* Вторая кнопка: белая заливка, тёмный текст; при наведении заливается жёлтым, как основная */
   .btn--light {
@@ -247,26 +281,67 @@
   /* Футер */
   .footer {
         position: relative; isolation: isolate;
-    display: grid; gap: clamp(2.5rem, 6vw, 4rem);
-    padding: clamp(3rem, 7vw, 5rem) var(--gutter) clamp(1.25rem, 3vw, 2rem);
-    background: var(--bg); color: var(--fg);
+    display: grid; gap: clamp(1.75rem, 4svh, 3rem);
+    padding: clamp(2.5rem, 7svh, 4.5rem) var(--gutter) clamp(1.25rem, 3vw, 2rem);
+    background:
+      linear-gradient(200deg, var(--glow) 0%, transparent 55%),
+      linear-gradient(20deg, var(--shade) 0%, transparent 55%),
+      var(--bg);
+    color: var(--fg);
   }
-  .footer__main { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: start; }
+  .footer__main { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: end; }
+  /* Статус «открыт к проектам»: жёлтая точка с расходящимся кольцом */
+  .footer__status {
+    display: inline-flex; align-items: center; gap: .65em;
+    margin-bottom: 1.25rem; padding: .45em 1em;
+    border-radius: 999px; background: rgb(0 0 0 / .2);
+    font-size: .85rem; font-weight: 600;
+  }
+  .footer__status i { position: relative; width: .55em; aspect-ratio: 1; border-radius: 50%; background: var(--giallo); }
+  .footer__status i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: inherit; animation: ping 2s var(--ease) infinite; }
+  @keyframes ping { 75%, 100% { transform: scale(2.8); opacity: 0; } }
   .footer__title {
     font-size: clamp(2rem, 3.6vw, 3.5rem);
     font-weight: 800; font-stretch: var(--display-stretch);
     line-height: .95; letter-spacing: -.01em; text-wrap: balance;
   }
   .footer__text { max-width: var(--measure); margin-top: 1rem; opacity: .75; text-wrap: pretty; }
-  .footer__links { list-style: none; padding: 0; display: grid; gap: .9rem; justify-items: start; font-size: clamp(1.05rem, 1.4vw, 1.3rem); font-weight: 600; }
+  .footer__actions { margin-top: clamp(1.25rem, 3vw, 2rem); gap: .75rem; }
+  .btn svg { width: 1.1em; height: 1.1em; margin-left: .65em; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  button.btn { border: 0; font: inherit; font-weight: 600; cursor: pointer; }
+
+  /* «Сейчас»: где я, который час и как работаю — строки с линиями, как в карточке компании */
+  .footer__now { border-top: 1px solid rgb(255 255 255 / .25); }
+  .footer__now > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .7rem 0; border-bottom: 1px solid rgb(255 255 255 / .25); }
+  .footer__now dt { opacity: .7; }
+  .footer__now dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+  .footer__now dd span { margin-left: .25em; font-weight: 500; opacity: .6; }
+
+  /* Карта сайта: три равные колонки, каждая по центру своей трети — строки стоят ровно напротив друг друга */
+  .footer__cols {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-items: center; gap: 2rem;
+    padding-top: clamp(1.5rem, 3vw, 2.25rem);
+    border-top: 1px solid rgb(255 255 255 / .25);
+  }
+  .footer__col h3 { margin-bottom: .85rem; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
+  .footer__col ul { list-style: none; padding: 0; display: grid; gap: .4rem; justify-items: start; }
+  /* Подчёркивание жёлтым растёт слева направо */
+  .footer__col a {
+    color: inherit; font-weight: 600; text-decoration: none;
+    background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 2px no-repeat;
+    transition: background-size .4s var(--ease);
+  }
+  .footer__col a:hover, .footer__col a:focus-visible { background-size: 100% 2px; }
   .footer__copy { font-size: .9em; opacity: .6; }
 
   /* Планшет (768–1024px): граф сбоку, как на десктопе. Колонка текста узкая —
      заголовок по ширине колонки, кнопки компактнее, чтобы стояли в ряд */
   @media (max-width: 64rem) {
     .hero__title { font-size: min(5.9vw, 10svh); }
-    .actions { gap: .75rem; }
+    .actions { gap: .75rem; max-width: 34rem; }
     .btn { padding: 1em 1.3em; }
+    /* Кнопки тянутся: влезают — делят строку, не влезают — каждая на всю ширину, одинаковые */
+    .actions .btn { flex: 1 1 auto; justify-content: center; }
   }
   /* Телефон (до 768px): граф сверху, текст сразу под ним — вместе по центру экрана */
   @media (max-width: 47.99rem) {
@@ -280,12 +355,13 @@
     /* Крупный заголовок: имя само переносится на две строки, «AI agentic engineer» — ровно по ширине экрана */
     .hero__title { font-size: clamp(2rem, min(13vw, 8svh), 5rem); margin-bottom: 1.25rem; }
     .hero__sub { font-size: clamp(1.05rem, 4.2vw, 1.5rem); margin-bottom: 1.75rem; }
-    .actions { gap: .75rem; max-width: 34rem; }
-    /* Кнопки тянутся: влезают — делят строку, не влезают — каждая на всю ширину */
-    .actions .btn { flex: 1 1 auto; justify-content: center; padding: 1em 1.5em; }
+    .actions .btn { padding: 1em 1.5em; }
   }
   @media (max-width: 52rem) {
     .footer__main { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 30rem) {
+    .footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); justify-items: start; gap: 1.75rem 1rem; }
   }
 }
 
@@ -299,7 +375,8 @@
     /* Фиксированная высота: содержимое панелей во время анимации не растягивает секцию и страница не прыгает */
     height: 100svh;
     min-height: 40rem;
-    padding-block: clamp(2rem, 7svh, 6rem);
+    /* Сверху — место под фиксированную навигацию: при переходе секция видна целиком */
+    padding-block: max(5.5rem, 10svh) clamp(1.5rem, 5svh, 4rem);
   }
   .projects .container { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: clamp(1.5rem, 5svh, 3.5rem); }
   .projects__head { display: flex; flex-direction: column; gap: clamp(.75rem, 2svh, 1.25rem); }
@@ -317,6 +394,8 @@
     flex: 1;
     min-height: 24rem;
     border-block: 1px solid rgb(255 255 255 / .15);
+    /* Раскрытие панели пересчитывает раскладку только внутри списка, а не всей страницы */
+    contain: layout paint;
   }
 
   .project {
@@ -330,6 +409,7 @@
     text-decoration: none;
     overflow: hidden;
     isolation: isolate;
+    contain: layout paint;
     /* Плавный разгон и торможение: панели не «прыгают» при переключении */
     --ease-panel: cubic-bezier(.65, 0, .35, 1);
     transition: flex-grow 1.1s var(--ease-panel);
@@ -458,18 +538,17 @@
   .js [data-reveal] {
     opacity: 0;
     transform: translateY(1.5rem);
-    filter: blur(6px);
-    transition: opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease);
+    transition: opacity .9s var(--ease), transform .9s var(--ease);
     transition-delay: calc(var(--i, 0) * 90ms + .5s);
   }
-  .js [data-reveal].is-visible { opacity: 1; transform: none; filter: none; }
+  .js [data-reveal].is-visible { opacity: 1; transform: none; }
   /* В секциях ниже первой задержка не нужна */
   .section ~ .section [data-reveal] { transition-delay: calc(var(--i, 0) * 90ms); }
 
   /* Индикатор прогресса: чем длиннее сайт, тем он полезнее */
   @supports (animation-timeline: scroll()) {
     .progress {
-      position: fixed; inset: 0 0 auto 0; z-index: 10;
+      position: fixed; inset: 0 0 auto 0; z-index: 60;
       height: 4px;
       background: var(--giallo);
       transform: scaleX(0); transform-origin: left;
@@ -481,7 +560,427 @@
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
-    .js [data-reveal] { opacity: 1; transform: none; filter: none; }
+    .js [data-reveal] { opacity: 1; transform: none; }
     .link { stroke-dashoffset: 0; }
+  }
+}
+/* ---------- Секция 3: стек как периодическая таблица ---------- */
+@layer sections {
+  .skills { display: flex; flex-direction: column; justify-content: center; padding-block: max(5.5rem, 10svh) clamp(2rem, 6svh, 5rem); }
+  .skills .container { display: flex; flex-direction: column; gap: clamp(.75rem, 2svh, 1.25rem); }
+  .skills__head { display: flex; flex-direction: column; gap: clamp(.75rem, 2svh, 1.25rem); }
+  .skills__title {
+    font-size: clamp(2.75rem, min(7vw, 10svh), 7rem);
+    font-weight: 800; font-stretch: var(--display-stretch);
+    line-height: .88; letter-spacing: -.015em; text-wrap: balance;
+  }
+  .skills__intro { max-width: 48rem; font-size: var(--step-1); font-weight: 500; line-height: 1.25; text-wrap: balance; opacity: .75; }
+
+  /* Цвета групп — как в настоящей таблице, каждая группа своим цветом */
+  [data-group="lang"]  { --el-bg: var(--rosso);  --el-fg: #fff; }
+  [data-group="ai"]    { --el-bg: var(--giallo); --el-fg: var(--ink); }
+  [data-group="data"]  { --el-bg: var(--ink);    --el-fg: #fff; }
+  [data-group="infra"] { --el-bg: #fff;          --el-fg: var(--ink); }
+
+  /* Таблица слева, карточка элемента справа */
+  .pt { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: clamp(1rem, 2.5vw, 2rem); align-items: stretch; }
+  .pt__table { display: flex; flex-direction: column; gap: .75rem; container-type: inline-size; }
+
+  /* Заголовки групп стоят над своими столбцами */
+  .pt__groups, .pt__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(.4rem, 1.2cqi, .75rem); }
+  .pt-group {
+    display: flex; align-items: center; gap: .5em;
+    padding: .35em 0;
+    border: 0; border-bottom: 2px solid rgb(24 24 24 / .12);
+    background: none; color: var(--ink);
+    font: inherit; font-size: clamp(.6rem, 1.7cqi, .85rem); font-weight: 700; line-height: 1.2; letter-spacing: .04em; text-transform: uppercase; text-align: left;
+    cursor: pointer;
+    transition: border-color .3s;
+  }
+  .pt-group i { width: .8em; aspect-ratio: 1; flex-shrink: 0; border-radius: 2px; background: var(--el-bg); box-shadow: inset 0 0 0 1px rgb(24 24 24 / .25); }
+  .pt-group.is-on, .pt-group[aria-pressed="true"] { border-color: var(--ink); }
+  /* В узкой таблице — короткие подписи групп */
+  .pt-group__short { display: none; }
+  @container (max-width: 30rem) { .pt-group__full { display: none; } .pt-group__short { display: inline; } }
+
+  /* Клетки идут сверху вниз по столбцам: в каждом столбце — своя группа */
+  .pt__grid { grid-template-rows: repeat(3, auto); grid-auto-flow: column; }
+  .el {
+    position: relative;
+    aspect-ratio: 1 / .92;
+    display: grid; grid-template-rows: auto 1fr auto; align-items: start;
+    padding: clamp(.45rem, 1.8cqi, 1rem);
+    border: 0; border-radius: clamp(.4rem, 1.2cqi, .75rem);
+    background: var(--el-bg); color: var(--el-fg);
+    box-shadow: inset 0 0 0 1px rgb(24 24 24 / .1);
+    font: inherit; text-align: left;
+    cursor: pointer;
+    transition: transform .35s var(--ease), box-shadow .35s var(--ease), opacity .35s;
+  }
+  .el:hover { box-shadow: inset 0 0 0 1px rgb(24 24 24 / .1), 0 .9rem 1.6rem -.9rem rgb(24 24 24 / .55); }
+  /* Выбранная клетка — двойная рамка, как выделение в таблице */
+  .el[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
+  .el:focus-visible { outline-offset: 6px; }
+  /* Наведение на группу приглушает остальные столбцы */
+  .pt__grid[data-focus="lang"] .el:not([data-group="lang"]),
+  .pt__grid[data-focus="ai"] .el:not([data-group="ai"]),
+  .pt__grid[data-focus="data"] .el:not([data-group="data"]),
+  .pt__grid[data-focus="infra"] .el:not([data-group="infra"]) { opacity: .15; }
+
+  .el__num { font-size: clamp(.55rem, 1.6cqi, .8rem); font-weight: 700; letter-spacing: .06em; opacity: .7; }
+  /* «Электроны»: точка за каждый год опыта */
+  .el__dots {
+    position: absolute; top: clamp(.6rem, 2.2cqi, 1.2rem); right: clamp(.45rem, 1.8cqi, 1rem);
+    width: calc(var(--n) * 7px); height: 5px;
+    background: radial-gradient(circle, currentColor 2px, transparent 2.5px) 0 0 / 7px 5px repeat-x;
+    opacity: .8;
+  }
+  .el__sym {
+    align-self: center;
+    font-size: clamp(1.5rem, 7.2cqi, 3.6rem);
+    font-weight: 800; font-stretch: var(--display-stretch);
+    line-height: 1; letter-spacing: -.01em;
+  }
+  .el__name { font-size: clamp(.55rem, 1.75cqi, .85rem); font-weight: 600; line-height: 1.15; overflow-wrap: anywhere; }
+  .el__desc { display: none; }
+
+  /* Карточка элемента: увеличенная клетка с описанием */
+  .el-card {
+    display: grid; grid-template-rows: auto auto auto 1fr auto auto; gap: .5rem;
+    padding: clamp(1.25rem, 2.4vw, 2rem);
+    border-radius: 1.25rem;
+    background: var(--el-bg); color: var(--el-fg);
+    box-shadow: inset 0 0 0 1px rgb(24 24 24 / .1), 0 1.5rem 3rem -1.8rem rgb(24 24 24 / .5);
+    transition: background .45s var(--ease), color .45s var(--ease);
+  }
+  .el-card__top { display: flex; justify-content: space-between; gap: 1rem; font-size: .85rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .75; }
+  .el-card__sym {
+    font-size: clamp(5rem, min(11vw, 20svh), 10rem);
+    font-weight: 800; font-stretch: var(--display-stretch);
+    /* Строка с запасом под хвосты букв (g, y, p): название стоит на одном расстоянии у всех элементов */
+    line-height: 1.12; letter-spacing: -.02em;
+    margin-top: -.08em;
+  }
+  .el-card__sym span { display: block; }
+  .el-card__name { font-size: clamp(1.5rem, 2.4vw, 2.2rem); font-weight: 800; font-stretch: var(--display-stretch); line-height: 1; }
+  .el-card__desc { max-width: 28rem; font-size: .95em; line-height: 1.5; text-wrap: pretty; opacity: .85; }
+  .el-card__exp { display: grid; grid-template-columns: 1fr auto; row-gap: .5rem; margin-top: .75rem; font-size: .9em; font-weight: 600; }
+  .el-card__exp > span { opacity: .65; font-weight: 500; }
+  /* Те же точки, что в углу клетки: сразу видно, что они значат годы опыта */
+  .el-card__dots {
+    display: inline-block; vertical-align: middle;
+    width: calc(var(--n) * 8px); height: 6px; margin-right: .6em;
+    background: radial-gradient(circle, currentColor 2.5px, transparent 3px) 0 0 / 8px 6px repeat-x;
+  }
+  .el-card__bar { grid-column: 1 / -1; position: relative; height: 4px; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, currentColor 18%, transparent); }
+  .el-card__bar i { position: absolute; inset: 0; background: currentColor; transform-origin: left; transform: scaleX(var(--level, 1)); transition: transform .8s var(--ease); }
+  .el-card__used { display: grid; gap: .15rem; padding-top: .75rem; border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent); font-size: .9em; }
+  .el-card__used span { font-size: .8em; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .6; }
+
+  /* Планшет и телефон: карточка под таблицей, символ слева от названия */
+  /* Десктоп: секция ровно в экран. Таблица берёт высоту, что осталась под заголовком:
+     в обычной пропорции, если влезает, а на невысоком экране клетки сплющиваются */
+  @media (min-width: 64.01rem) {
+    .skills { height: max(100svh, 34rem); }
+    .skills .container { flex: 1; min-height: 0; justify-content: center; container-type: inline-size; }
+    /* Подзаголовок и таблица слева, карточка справа во всю их высоту */
+    .pt {
+      flex: 0 1 calc(42cqi + 9rem); min-height: 0;
+      grid-template-areas: "intro card" "table card"; grid-template-rows: auto minmax(0, 1fr);
+      row-gap: clamp(1.25rem, 4svh, 2.5rem);
+    }
+    .skills__intro { grid-area: intro; }
+    .pt__table { grid-area: table; min-height: 0; }
+    .el-card { grid-area: card; }
+    .pt__grid { flex: 1; min-height: 0; grid-template-rows: repeat(3, minmax(0, 1fr)); }
+    .el { aspect-ratio: auto; min-height: 0; overflow: hidden; }
+    .el__sym { font-size: clamp(1.5rem, min(7.2cqi, 8svh), 3.6rem); }
+    .el-card { min-height: 0; padding: clamp(1rem, min(2.4vw, 3.5svh), 2rem); gap: min(.5rem, 1svh); }
+    /* Символу достаётся высота, что осталась от текста: длинное описание не выталкивает низ карточки */
+    .el-card { grid-template-rows: auto minmax(0, 1fr) auto auto auto auto; }
+    .el-card__sym { container-type: size; min-height: 0; margin-top: 0; }
+    .el-card__sym span { margin-top: -.08em; font-size: clamp(2.5rem, min(14vw, 88cqh), 14rem); }
+  }
+
+  @media (max-width: 64rem) {
+    .pt { grid-template-columns: 1fr; }
+    .el-card { grid-template-columns: auto 1fr; grid-template-rows: none; column-gap: 1.25rem; }
+    .el-card__top, .el-card__desc, .el-card__exp, .el-card__used { grid-column: 1 / -1; }
+    .el-card__sym { font-size: clamp(4rem, 18vw, 7rem); }
+    .el-card__name { align-self: end; padding-bottom: .4rem; }
+  }
+  /* Планшет: клетки ниже квадрата, а карточка лежит горизонтально — символ слева, текст справа.
+     Так таблица и подробности помещаются на один экран и не надо листать туда-обратно */
+  @media (min-width: 48rem) and (max-width: 64rem) {
+    .el { aspect-ratio: auto; height: clamp(5.5rem, min(14cqi, 14svh), 8.5rem); }
+    .el__sym { font-size: clamp(1.5rem, 5.4cqi, 2.6rem); }
+    .el-card {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas: "sym top" "sym name" "sym desc" "sym exp" "sym used";
+      align-items: start; column-gap: clamp(1.5rem, 4vw, 3rem); row-gap: .4rem;
+    }
+    .el-card > * { grid-column: auto; }
+    .el-card__top { grid-area: top; }
+    .el-card__sym { grid-area: sym; align-self: center; font-size: clamp(5rem, 15vw, 9rem); }
+    .el-card__name { grid-area: name; padding-bottom: 0; }
+    .el-card__desc { grid-area: desc; }
+    .el-card__exp { grid-area: exp; margin-top: .25rem; }
+    .el-card__used { grid-area: used; }
+  }
+}
+
+/* ======================================================================
+   Интерактив: прелоадер, курсор, навигация, «стопка карт», занавес футера
+   ====================================================================== */
+
+/* ---------- Компоненты ---------- */
+@layer components {
+  /* Заставка. Всё движение — CSS-анимации transform и opacity, скрипт только переключает фазы */
+  .loader { display: none; }
+  .is-loading .loader, .loader.is-go { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; }
+  .loader.is-go { pointer-events: none; }
+  .loader__bg { position: absolute; inset: 0; background: #0b0b0b; }
+  /* Красная вспышка за логотипом в момент «удара» */
+  .loader__glow {
+    position: absolute; left: 50%; top: 50%;
+    width: 110vmax; aspect-ratio: 1; translate: -50% -50%;
+    background: radial-gradient(closest-side, rgb(220 0 0 / .5), rgb(220 0 0 / .14) 45%, transparent 70%);
+    opacity: 0;
+  }
+  .loader__logo { position: relative; display: flex; align-items: center; gap: clamp(1rem, 3vw, 2.25rem); }
+  /* Ромб — тот же знак, что в навигации, только крупный */
+  .loader__mark { position: relative; flex-shrink: 0; width: clamp(3rem, 7vw, 6rem); aspect-ratio: 1; background: var(--giallo); transform: rotate(45deg) scale(0); }
+  .loader__mark i { position: absolute; inset: 30%; background: #0b0b0b; }
+  .loader__name {
+    display: flex; overflow: hidden; padding-block: .08em;
+    color: #fff;
+    font-size: clamp(3.5rem, 11vw, 9rem); font-weight: 800; font-stretch: var(--display-stretch);
+    line-height: .9; letter-spacing: -.01em;
+  }
+  .loader__name span { display: inline-block; transform: translateY(115%); }
+  /* Ленты: вертикальные полосы с мягкими концами, разлетаются из центра */
+  .loader__streaks { position: absolute; inset: 0; }
+  .loader__streaks i {
+    position: absolute; top: -15%; bottom: -15%; left: 50%;
+    width: var(--w); margin-left: calc(var(--w) / -2);
+    background: linear-gradient(transparent, var(--c) 18%, var(--c) 82%, transparent);
+    opacity: 0; transform: scaleY(0);
+  }
+
+  /* Фаза 1. Ромб «бьёт» с перелётом, за ним вспыхивает свет, буквы выезжают по одной, всё медленно наезжает */
+  .loader.is-in .loader__logo { animation: ld-push 4s linear both; }
+  .loader.is-in .loader__mark { animation: ld-mark .9s cubic-bezier(.2, .9, .25, 1.3) both; }
+  .loader.is-in .loader__glow { animation: ld-glow 1.6s .25s ease-out both; }
+  .loader.is-in .loader__name span { animation: ld-letter .75s calc(.3s + var(--i) * 50ms) var(--ease) both; }
+  @keyframes ld-push { from { transform: scale(.96); } to { transform: scale(1.06); } }
+  @keyframes ld-mark { from { transform: rotate(-135deg) scale(0); } to { transform: rotate(45deg) scale(1); } }
+  @keyframes ld-glow { 0% { opacity: 0; transform: scale(.6); } 25% { opacity: 1; } 100% { opacity: .45; transform: scale(1); } }
+  @keyframes ld-letter { to { transform: none; } }
+
+  /* Фаза 2. Имя гаснет, камера влетает в ромб, из него разлетаются ленты, фон растворяется — и мы на сайте */
+  .loader.is-go .loader__name { animation: ld-fade .3s ease-in both; }
+  .loader.is-go .loader__logo { translate: var(--dx, 0) 0; transition: translate .45s var(--ease); }
+  .loader.is-go .loader__mark { animation: ld-dive .85s cubic-bezier(.6, 0, .9, .45) both; }
+  .loader.is-go .loader__glow { --from: .45; animation: ld-fade .4s .3s ease-in both; }
+  .loader.is-go .loader__bg { animation: ld-fade .55s .5s ease-in both; }
+  /* Ленты вылетают поверх ромба */
+  .loader.is-go .loader__streaks { z-index: 1; animation: ld-fly 1.6s cubic-bezier(.5, 0, .75, 0) both; }
+  .loader.is-go .loader__streaks i { animation: ld-streak 1.1s calc(.12s + var(--d)) cubic-bezier(.2, .7, .3, 1) both; }
+  @keyframes ld-fade { from { opacity: var(--from, 1); } to { opacity: 0; } }
+  /* Ромб гаснет, пока растёт, — дальше камера летит уже сквозь ленты */
+  @keyframes ld-dive { from { transform: rotate(45deg) scale(1); } 45% { opacity: 1; } 75%, to { opacity: 0; } to { transform: rotate(45deg) scale(32); } }
+  @keyframes ld-fly { to { transform: scale(2.2); } }
+  @keyframes ld-streak {
+    0% { opacity: 0; transform: translateX(0) scaleY(0); }
+    30% { opacity: 1; }
+    55% { opacity: 1; transform: translateX(var(--x)) scaleY(1); }
+    100% { opacity: 0; transform: translateX(calc(var(--x) * 1.6)) scaleY(1); }
+  }
+
+  /* Свой курсор: точка и кольцо. Двигаются через transform, на каждом кадре ничего не перерисовывается */
+  .cursor-dot, .cursor-ring { position: fixed; left: 0; top: 0; z-index: 2000; pointer-events: none; will-change: transform; transition: opacity .3s; }
+  .cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--cursor, var(--giallo)); }
+  .cursor-ring {
+    width: 34px; height: 34px; margin: -17px 0 0 -17px;
+    border: 1.5px solid var(--cursor, var(--giallo)); border-radius: 50%;
+    transition: scale .3s var(--ease), border-color .3s, opacity .3s;
+  }
+  .cursor-ring.is-down { scale: .75; }
+  .is-cursor-away :is(.cursor-dot, .cursor-ring) { opacity: 0; }
+
+  /* Зерно поверх всего сайта — едва заметная «плёнка» */
+  .grain {
+    position: fixed; inset: 0; z-index: 900;
+    pointer-events: none;
+    opacity: .06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Навигация */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    display: flex; align-items: center; gap: clamp(1rem, 2vw, 1.75rem);
+    padding: .9rem max(var(--gutter), (100% - 1440px) / 2);
+    color: var(--fg);
+    font-size: .95rem; font-weight: 600;
+    transition: transform .6s var(--ease), opacity .6s, color .4s, background .4s;
+  }
+  .nav.is-scrolled { background: var(--bg); box-shadow: 0 1px 0 rgb(0 0 0 / .08); }
+  .is-loading .nav { opacity: 0; }
+  /* Логотип: жёлтый ромб-«узел» и фамилия узким начертанием. При наведении ромб поворачивается */
+  .nav__logo { display: inline-flex; align-items: center; gap: .7rem; color: inherit; text-decoration: none; }
+  .nav__mark {
+    position: relative;
+    width: 1.35rem; aspect-ratio: 1;
+    background: var(--giallo);
+    rotate: 45deg;
+    transition: rotate .6s var(--ease);
+  }
+  .nav__mark i { position: absolute; inset: 30%; background: var(--ink); transition: inset .4s var(--ease); }
+  .nav__logo:hover .nav__mark { rotate: 135deg; }
+  .nav__logo:hover .nav__mark i { inset: 18%; }
+  .nav__name {
+    display: grid;
+    font-size: 1.7rem; font-weight: 800; font-stretch: var(--display-stretch);
+    line-height: .85; letter-spacing: -.01em;
+  }
+  .nav__name small { font-size: .62rem; font-weight: 600; font-stretch: 100%; letter-spacing: .14em; text-transform: uppercase; opacity: .7; margin-top: .3rem; }
+  .nav__links { margin-left: auto; display: flex; gap: clamp(1.25rem, 2.5vw, 2.25rem); }
+  .nav__links a { position: relative; color: inherit; text-decoration: none; padding-block: .3em; }
+  .nav__links a::after {
+    content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 2px;
+    background: var(--accent);
+    transform: scaleX(0); transform-origin: right;
+    transition: transform .5s var(--ease);
+  }
+  .nav__links a:hover::after, .nav__links a:focus-visible::after { transform: scaleX(1); transform-origin: left; }
+  .nav__menu { display: none; margin-left: auto; align-items: center; gap: .75rem; padding: .5rem 0; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
+  .nav__burger { position: relative; width: 1.6rem; height: .7rem; }
+  .nav__burger i { position: absolute; left: 0; width: 100%; height: 2px; background: currentColor; transition: transform .5s var(--ease), top .5s var(--ease); }
+  .nav__burger i:first-child { top: 0; }
+  .nav__burger i:last-child { top: calc(100% - 2px); }
+  .menu-open .nav__burger i { top: calc(50% - 1px); }
+  .menu-open .nav__burger i:first-child { transform: rotate(45deg); }
+  .menu-open .nav__burger i:last-child { transform: rotate(-45deg); }
+  .menu-open .nav { --fg: #fff; --bg: var(--ink); background: none; box-shadow: none; }
+
+  /* Полноэкранное меню */
+  .menu {
+    position: fixed; inset: 0; z-index: 45;
+    display: flex; flex-direction: column; justify-content: center; gap: 3rem;
+    padding: 6rem var(--gutter) 2.5rem;
+    background: var(--ink); color: #fff;
+    clip-path: circle(0 at var(--ox, 100%) var(--oy, 0));
+    transition: clip-path .7s cubic-bezier(.65, 0, .35, 1);
+  }
+  .menu[hidden] { display: none; }
+  .menu-open .menu { clip-path: circle(150vmax at var(--ox, 100%) var(--oy, 0)); }
+  .menu-open, .menu-open body { overflow: hidden; }
+  .menu__list { list-style: none; padding: 0; display: grid; gap: .4rem; }
+  .menu__list li { overflow: clip; }
+  .menu__list a {
+    display: flex; align-items: baseline; gap: 1rem;
+    color: inherit; text-decoration: none;
+    font-size: clamp(2.75rem, 14vw, 5.5rem);
+    font-weight: 800; font-stretch: var(--display-stretch); line-height: 1.02;
+    transform: translateY(105%);
+    transition: transform .7s var(--ease), color .3s;
+  }
+  .menu__list a:hover { color: var(--giallo); }
+  .menu-open .menu__list a { transform: none; }
+  .menu__list li:nth-child(1) a { transition-delay: .25s; }
+  .menu__list li:nth-child(2) a { transition-delay: .31s; }
+  .menu__list li:nth-child(3) a { transition-delay: .37s; }
+  .menu__list li:nth-child(4) a { transition-delay: .43s; }
+  .menu__list small { font-size: .9rem; font-weight: 700; font-stretch: 100%; color: var(--giallo); }
+  .menu__foot { opacity: .6; }
+
+  /* Кнопка «наверх» с кольцом прогресса прокрутки */
+  .to-top {
+    position: fixed; right: clamp(1rem, 3vw, 2rem); bottom: clamp(1rem, 3vw, 2rem); z-index: 40;
+    width: 3.5rem; aspect-ratio: 1;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: var(--ink); color: #fff;
+    box-shadow: 0 .75rem 2rem -.75rem rgb(0 0 0 / .5);
+    opacity: 0; scale: .5; pointer-events: none;
+    transition: opacity .4s, scale .5s var(--ease), background .3s;
+  }
+  .to-top.is-on { opacity: 1; scale: 1; pointer-events: auto; }
+  .to-top:hover { background: var(--rosso); }
+  .to-top svg { position: absolute; inset: 0; width: 100%; rotate: -90deg; fill: none; }
+  .to-top__track { stroke: rgb(255 255 255 / .15); stroke-width: 2; }
+  .to-top__ring { stroke: var(--giallo); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .to-top__arrow { width: 32%; aspect-ratio: 1; background: currentColor; clip-path: polygon(50% 0, 100% 50%, 64% 50%, 64% 100%, 36% 100%, 36% 50%, 0 50%); }
+
+  /* Уведомление */
+  .toast {
+    position: fixed; left: 50%; bottom: clamp(1rem, 3vw, 2rem); z-index: 950;
+    padding: .9em 1.5em;
+    border-radius: 999px;
+    background: var(--ink); color: var(--giallo);
+    font-weight: 700;
+    box-shadow: 0 1rem 2.5rem -1rem rgb(0 0 0 / .6);
+    translate: -50% 180%;
+    transition: translate .6s var(--ease);
+    pointer-events: none;
+  }
+  .toast.is-on { translate: -50% 0; }
+  .toast:empty { display: none; }
+
+}
+
+/* ---------- Секции ---------- */
+@layer sections {
+  /* Под фиксированной навигацией первому экрану нужен отступ сверху */
+  .hero { padding-top: max(5.5rem, 5svh); }
+
+  /* Узлы сети — кнопки */
+  .node { cursor: pointer; outline: none; }
+  .node:focus-visible .node__ring { opacity: 1; stroke: var(--giallo); }
+  .node:hover .node__bg { fill: #2a2a2a; }
+  .node[data-state="work"]:hover .node__bg, .node[data-state="done"]:hover .node__bg { fill: var(--giallo); }
+
+  /* Пока идёт прелоадер, анимации первого экрана стоят на старте */
+  .is-loading .hero *, .is-loading .hero *::before, .is-loading .hero *::after { animation-play-state: paused !important; }
+  /* Сквозь буквы прелоадера виден фон сайта — заголовок появится уже после влёта */
+  .is-loading .hero__title { opacity: 0; }
+
+  /* Стопка карт: top секциям задаёт скрипт, высокая прилипает нижним краем */
+  .has-stack main { position: relative; z-index: 1; background: var(--ink); }
+  .has-stack main > .section { position: sticky; }
+  .has-stack main > .section + .section { border-radius: 2.5rem 2.5rem 0 0; transition: border-radius .4s var(--ease); }
+  .has-stack main > .section.is-stuck { border-radius: 0; }
+  .section__shade { position: absolute; inset: 0; z-index: 20; background: #000; opacity: 0; pointer-events: none; }
+
+  /* Занавес: футер лежит под страницей, страница уезжает вверх и открывает его */
+  .has-curtain main { position: relative; z-index: 1; background: var(--ink); }
+  .has-curtain .footer { position: sticky; bottom: 0; z-index: 0; }
+  .footer { overflow: clip; }
+  .footer__main, .footer__cols, .footer__bottom {
+    transform: translateY(calc((1 - var(--reveal, 1)) * -14vh));
+    opacity: calc(.15 + var(--reveal, 1) * .85);
+  }
+  /* Справа место под кнопку «наверх» */
+  .footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem 2rem; padding-right: 4.5rem; }
+  .footer__hint { font-size: .9em; opacity: .6; }
+
+  @media (max-width: 47.99rem) {
+    .nav__links { display: none; }
+    .nav__menu { display: flex; }
+    .hero { padding-top: 5rem; }
+  }
+}
+
+/* ---------- Движение ---------- */
+@layer motion {
+
+  /* Клетки таблицы появляются волной по диагонали */
+  .js .el[data-reveal] { transform: translateY(1.25rem) scale(.82); transition-delay: calc(var(--i, 0) * 70ms); }
+  .js .el[data-reveal].is-visible { transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain { display: none; }
+    .footer__status i::after { animation: none; }
   }
 }

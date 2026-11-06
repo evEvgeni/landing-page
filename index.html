@@ -6,17 +6,86 @@
   <title>Евгений — AI agentic engineer</title>
   <meta name="description" content="Проектирую автономных ИИ-агентов, которые доводят задачи до результата.">
   <meta name="theme-color" content="#dc0000">
-  <script>document.documentElement.classList.add('js')</script>
+  <script>
+    // Прелоадер показывается один раз за сессию; ?intro в адресе — показать всегда
+    (() => {
+      const d = document.documentElement;
+      d.classList.add('js');
+      let seen = false;
+      try { seen = sessionStorage.getItem('booted') === '1'; } catch (e) {}
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if ((!seen || location.search.includes('intro')) && !still) d.classList.add('is-loading');
+      // Страховка: если скрипты не загрузились, прелоадер не должен закрывать сайт навсегда
+      setTimeout(() => d.classList.remove('is-loading'), 9000);
+    })();
+  </script>
   <link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=2">
-  <script src="script.js?v=2" defer></script>
+  <link rel="preload" href="fonts/robotoflex-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/sofiasans-xcond-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css?v=48">
+  <!-- Обычные скрипты, а не модули: страница работает и при открытии файла напрямую (file://) -->
+  <script src="js/core.js?v=48" defer></script>
+  <script src="js/loader.js?v=48" defer></script>
+  <script src="js/net.js?v=48" defer></script>
+  <script src="js/cursor.js?v=48" defer></script>
+  <script src="js/scramble.js?v=48" defer></script>
+  <script src="js/scroll.js?v=48" defer></script>
+  <script src="js/nav.js?v=48" defer></script>
+  <script src="js/skills.js?v=48" defer></script>
+  <script src="js/easter.js?v=48" defer></script>
+  <script src="js/footer.js?v=48" defer></script>
 </head>
 <body>
+  <!-- Заставка: логотип появляется с «ударом», камера влетает в ромб,
+       и он разлетается на ленты цветов сайта, сквозь которые открывается страница -->
+  <div class="loader" data-loader role="status" aria-label="Загрузка сайта">
+    <div class="loader__bg"></div>
+    <div class="loader__glow"></div>
+    <div class="loader__streaks" data-loader-streaks></div>
+    <div class="loader__logo" aria-hidden="true">
+      <span class="loader__mark"><i></i></span>
+      <span class="loader__name" data-loader-name>Шварц</span>
+    </div>
+  </div>
+
   <div class="progress" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav" data-nav data-theme="rosso">
+    <!-- Логотип: ромб-«узел» сети и фамилия узким начертанием -->
+    <a class="nav__logo" href="#hero" aria-label="Евгений Шварц — наверх">
+      <span class="nav__mark" aria-hidden="true"><i></i></span>
+      <span class="nav__name">Шварц<small>agentic engineer</small></span>
+    </a>
+    <nav class="nav__links" aria-label="Разделы">
+      <a href="#projects">Проекты</a>
+      <a href="#skills">Технологии</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <button class="nav__menu" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle>
+      <span class="nav__menu-label">Меню</span><span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </header>
+
+  <!-- Полноэкранное меню для телефона: раскрывается кругом из кнопки -->
+  <div class="menu" id="menu" data-theme="ink" data-menu hidden>
+    <ol class="menu__list">
+      <li><a href="#hero"><small>01</small>Главная</a></li>
+      <li><a href="#projects"><small>02</small>Проекты</a></li>
+      <li><a href="#skills"><small>03</small>Технологии</a></li>
+      <li><a href="#contacts"><small>04</small>Контакты</a></li>
+    </ol>
+    <p class="menu__foot">hello@example.com</p>
+  </div>
+
+  <a class="to-top" href="#hero" data-to-top aria-label="Наверх">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><circle class="to-top__track" cx="24" cy="24" r="22"/><circle class="to-top__ring" cx="24" cy="24" r="22" pathLength="1"/></svg>
+    <span class="to-top__arrow" aria-hidden="true"></span>
+  </a>
 
   <main>
     <!-- Секция 1 -->
-    <section class="section hero" data-theme="rosso" id="hero">
+    <section class="section hero" data-theme="rosso" id="hero" data-title="Главная">
       <div class="hero__bg" aria-hidden="true"><i></i><i></i></div>
       <div class="hero__text">
         <h1 class="hero__title">
@@ -110,7 +179,7 @@
     </section>
 
     <!-- Секция 2 -->
-    <section class="section projects" data-theme="ink" id="projects">
+    <section class="section projects" data-theme="ink" id="projects" data-title="Проекты">
       <div class="container">
         <header class="projects__head">
           <h2 class="projects__title" data-reveal>Проекты</h2>
@@ -196,22 +265,178 @@
         </div>
       </div>
     </section>
+
+    <!-- Секция 3: стек как периодическая таблица. Столбцы — группы, клетки — технологии,
+         карточка справа показывает выбранный элемент -->
+    <section class="section skills" data-theme="paper" id="skills" data-title="Технологии">
+      <div class="container">
+        <header class="skills__head">
+          <h2 class="skills__title" data-reveal>Технологии, которыми я владею</h2>
+        </header>
+
+        <!-- Подзаголовок внутри таблицы: на десктопе карточка справа начинается вровень с ним -->
+        <div class="pt">
+          <p class="skills__intro" data-reveal>Периодическая система моего стека: наведите на элемент, чтобы узнать подробности.</p>
+          <div class="pt__table">
+            <div class="pt__groups" data-reveal>
+            <button class="pt-group" type="button" data-group="lang" aria-pressed="false" aria-label="Языки"><i></i><span class="pt-group__full">Языки</span><span class="pt-group__short">Языки</span></button>
+            <button class="pt-group" type="button" data-group="ai" aria-pressed="false" aria-label="Модели и агенты"><i></i><span class="pt-group__full">Модели и агенты</span><span class="pt-group__short">Агенты</span></button>
+            <button class="pt-group" type="button" data-group="data" aria-pressed="false" aria-label="Данные"><i></i><span class="pt-group__full">Данные</span><span class="pt-group__short">Данные</span></button>
+            <button class="pt-group" type="button" data-group="infra" aria-pressed="false" aria-label="Инфраструктура"><i></i><span class="pt-group__full">Инфраструктура</span><span class="pt-group__short">Инфра</span></button>
+            </div>
+            <div class="pt__grid" data-pt-grid>
+            <button class="el" type="button" data-reveal data-group="lang" data-gname="Языки" data-years="5" data-used="Support Agent, Research Crew" aria-pressed="true">
+              <span class="el__num">01</span><span class="el__dots" style="--n:5" aria-label="5 лет опыта"></span>
+              <span class="el__sym">Py</span>
+              <span class="el__name">Python</span>
+              <span class="el__desc">Основной язык: агенты, пайплайны данных и API на FastAPI. Типизация, asyncio, pytest.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="lang" data-gname="Языки" data-years="3" data-used="Review Agent" aria-pressed="false">
+              <span class="el__num">02</span><span class="el__dots" style="--n:3" aria-label="3 года опыта"></span>
+              <span class="el__sym">Ts</span>
+              <span class="el__name">TypeScript</span>
+              <span class="el__desc">Сервисы на Node.js, боты и GitHub-приложения, через которые агенты встраиваются в работу команды.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="lang" data-gname="Языки" data-years="2" data-used="Ops Autopilot" aria-pressed="false">
+              <span class="el__num">03</span><span class="el__dots" style="--n:2" aria-label="2 года опыта"></span>
+              <span class="el__sym">Go</span>
+              <span class="el__name">Go</span>
+              <span class="el__desc">Быстрые фоновые сервисы: сбор логов, очереди задач и обвязка вокруг агентов в продакшене.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="ai" data-gname="Модели и агенты" data-years="3" data-used="Review Agent, Support Agent" aria-pressed="false">
+              <span class="el__num">04</span><span class="el__dots" style="--n:3" aria-label="3 года опыта"></span>
+              <span class="el__sym">Ai</span>
+              <span class="el__name">LLM API</span>
+              <span class="el__desc">Claude и OpenAI: tool use, структурированный вывод, промпты и оценка качества ответов на своих тестах.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="ai" data-gname="Модели и агенты" data-years="2" data-used="Support Agent" aria-pressed="false">
+              <span class="el__num">05</span><span class="el__dots" style="--n:2" aria-label="2 года опыта"></span>
+              <span class="el__sym">Lg</span>
+              <span class="el__name">LangGraph</span>
+              <span class="el__desc">Графы агентов с состоянием, ветвлениями и человеком в контуре — для задач, где одного промпта мало.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="ai" data-gname="Модели и агенты" data-years="1" data-used="Ops Autopilot" aria-pressed="false">
+              <span class="el__num">06</span><span class="el__dots" style="--n:1" aria-label="1 год опыта"></span>
+              <span class="el__sym">Mc</span>
+              <span class="el__name">MCP</span>
+              <span class="el__desc">Пишу MCP-серверы, чтобы агенты безопасно работали с базами, файлами и внутренними API компании.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="data" data-gname="Данные" data-years="2" data-used="Research Crew, Support Agent" aria-pressed="false">
+              <span class="el__num">07</span><span class="el__dots" style="--n:2" aria-label="2 года опыта"></span>
+              <span class="el__sym">Rg</span>
+              <span class="el__name">RAG</span>
+              <span class="el__desc">Нарезка документов, гибридный поиск, реранкинг и ссылка на источник в каждом ответе.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="data" data-gname="Данные" data-years="4" data-used="Support Agent" aria-pressed="false">
+              <span class="el__num">08</span><span class="el__dots" style="--n:4" aria-label="4 года опыта"></span>
+              <span class="el__sym">Pg</span>
+              <span class="el__name">Postgres</span>
+              <span class="el__desc">Основная база: pgvector для эмбеддингов, история диалогов и состояние агентов.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="data" data-gname="Данные" data-years="2" data-used="Research Crew" aria-pressed="false">
+              <span class="el__num">09</span><span class="el__dots" style="--n:2" aria-label="2 года опыта"></span>
+              <span class="el__sym">Qd</span>
+              <span class="el__name">Qdrant</span>
+              <span class="el__desc">Векторный поиск по миллионам фрагментов с фильтрами по метаданным.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="infra" data-gname="Инфраструктура" data-years="4" data-used="все проекты" aria-pressed="false">
+              <span class="el__num">10</span><span class="el__dots" style="--n:4" aria-label="4 года опыта"></span>
+              <span class="el__sym">Dk</span>
+              <span class="el__name">Docker</span>
+              <span class="el__desc">Каждый агент живёт в контейнере и одинаково работает у меня, в CI и в продакшене.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="infra" data-gname="Инфраструктура" data-years="3" data-used="Ops Autopilot" aria-pressed="false">
+              <span class="el__num">11</span><span class="el__dots" style="--n:3" aria-label="3 года опыта"></span>
+              <span class="el__sym">Kb</span>
+              <span class="el__name">Kubernetes</span>
+              <span class="el__desc">Выкатка в кластер: health-checks, автоскейлинг и откат релиза одной командой.</span>
+            </button>
+            <button class="el" type="button" data-reveal data-group="infra" data-gname="Инфраструктура" data-years="5" data-used="Review Agent" aria-pressed="false">
+              <span class="el__num">12</span><span class="el__dots" style="--n:5" aria-label="5 лет опыта"></span>
+              <span class="el__sym">Ci</span>
+              <span class="el__name">CI/CD</span>
+              <span class="el__desc">GitHub Actions: тесты, линтеры и прогон evals на каждый pull request.</span>
+            </button>
+            </div>
+          </div>
+
+          <!-- Карточка выбранного элемента — как увеличенная клетка таблицы -->
+          <article class="el-card" data-group="lang" data-el-card data-reveal aria-live="polite">
+            <div class="el-card__top">
+              <span class="el-card__num" data-c="num">01</span>
+              <span class="el-card__group" data-c="group">Языки</span>
+            </div>
+            <div class="el-card__sym"><span data-c="sym">Py</span></div>
+            <h3 class="el-card__name" data-c="name">Python</h3>
+            <p class="el-card__desc" data-c="desc">Основной язык: агенты, пайплайны данных и API на FastAPI. Типизация, asyncio, pytest.</p>
+            <div class="el-card__exp">
+              <span>Опыт</span><b><i class="el-card__dots" data-c="dots" style="--n:5" aria-hidden="true"></i><span data-c="years">5 лет</span></b>
+              <i class="el-card__bar"><i data-c="bar" style="--level:1.0"></i></i>
+            </div>
+            <p class="el-card__used"><span>В проектах</span><b data-c="used">Support Agent, Research Crew</b></p>
+          </article>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="footer" data-theme="rosso" id="contacts">
+  <footer class="footer" data-theme="rosso" id="contacts" data-title="Контакты">
     <div class="footer__main">
-      <div>
+      <div class="footer__cta">
+        <p class="footer__status" data-reveal><i aria-hidden="true"></i>Открыт к новым проектам</p>
         <h2 class="footer__title" data-reveal>Есть задача для ИИ&#8209;агента?</h2>
-        <p class="footer__text" data-reveal>Расскажите, что нужно автоматизировать, и я отвечу в течение дня.</p>
+        <p class="footer__text" data-reveal>Расскажите, что нужно автоматизировать, и я отвечу в течение дня. Первая консультация бесплатно.</p>
+        <div class="actions footer__actions" data-reveal>
+          <button class="btn" type="button" data-copy="hello@example.com" aria-label="Скопировать почту hello@example.com">
+            hello@example.com
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+          </button>
+          <a class="btn btn--light" href="https://t.me/your_name">Написать в Telegram</a>
+        </div>
       </div>
-      <ul class="footer__links" data-reveal>
-        <li><a class="link-next" href="mailto:hello@example.com">hello@example.com</a></li>
-        <li><a class="link-next" href="https://t.me/your_name">Telegram</a></li>
-        <li><a class="link-next" href="https://github.com/your-name">GitHub</a></li>
-        <li><a class="link-next" href="https://www.linkedin.com/in/your-name">LinkedIn</a></li>
-      </ul>
+      <dl class="footer__now" data-reveal>
+        <div><dt>Где</dt><dd>Минск, работаю удалённо</dd></div>
+        <div><dt>Местное время</dt><dd><time data-clock data-tz="Europe/Minsk">12:00</time> <span>UTC+3</span></dd></div>
+        <div><dt>Формат</dt><dd>проекты и полная занятость</dd></div>
+        <div><dt>Ответ</dt><dd>в течение дня</dd></div>
+      </dl>
     </div>
-    <p class="footer__copy">© <span data-year>2026</span> Евгений. Все права защищены.</p>
+
+    <nav class="footer__cols" aria-label="Карта сайта" data-reveal>
+      <div class="footer__col">
+        <h3>Навигация</h3>
+        <ul>
+          <li><a href="#hero">Главная</a></li>
+          <li><a href="#projects">Проекты</a></li>
+          <li><a href="#skills">Технологии</a></li>
+          <li><a href="#contacts">Контакты</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h3>Проекты</h3>
+        <ul>
+          <li><a href="https://github.com/your-name/support-agent">Support Agent</a></li>
+          <li><a href="https://github.com/your-name/review-agent">Review Agent</a></li>
+          <li><a href="https://github.com/your-name/research-crew">Research Crew</a></li>
+          <li><a href="https://github.com/your-name/ops-autopilot">Ops Autopilot</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h3>Связь</h3>
+        <ul>
+          <li><a href="mailto:hello@example.com">Почта</a></li>
+          <li><a href="https://t.me/your_name">Telegram</a></li>
+          <li><a href="https://github.com/your-name">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/your-name">LinkedIn</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="footer__bottom">
+      <p class="footer__copy">© <span data-year>2026</span> Евгений Шварц</p>
+      <p class="footer__hint">Подсказка: наберите <kbd>agent</kbd></p>
+    </div>
   </footer>
+  <div class="toast" role="status" aria-live="polite" data-toast></div>
 </body>
 </html>
