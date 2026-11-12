@@ -10,6 +10,8 @@
   // Позиции секций считаем один раз (и при ресайзе), а не опрашиваем раскладку на каждом кадре
   let tops = [], mainH = 0;
   const measure = () => {
+    // Позиции считает scroll.js: он знает про паузы между разделами
+    if (App.measureSections) { ({ tops, mainH } = App.measureSections()); return; }
     let y = 0;
     tops = sections.map((s) => { const t = y; y += s.offsetHeight; return t; });
     mainH = y;

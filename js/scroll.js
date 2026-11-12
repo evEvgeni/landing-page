@@ -12,6 +12,26 @@
   // Затемнение — отдельный слой: его opacity не трогает стили содержимого секции
   const stack = !still;
   root.classList.toggle('has-stack', stack);
+  // Пауза после раздела: прокрутка какое-то время держит его целиком на экране и только потом
+  // наезжает следующий. Без неё следующая карта начинала закрывать раздел сразу, и приходилось листать назад.
+  // Первый экран без паузы — с него и так начинают, а «мёртвый» первый скролл выглядел бы поломкой
+  if (stack) sections.slice(1).forEach((s) => {
+    const d = document.createElement('div');
+    d.className = 'stack-hold';
+    d.setAttribute('aria-hidden', 'true');
+    s.after(d);
+  });
+  // Верх каждого раздела в документе с учётом пауз. Им же пользуется навигация
+  App.measureSections = () => {
+    let y = 0;
+    const tops = [];
+    for (const c of main.children) {
+      const i = sections.indexOf(c);
+      if (i >= 0) tops[i] = y;
+      y += c.offsetHeight;
+    }
+    return { tops, mainH: y };
+  };
   const shades = sections.slice(0, -1).map((s) => {
     if (!stack) return null;
     const d = document.createElement('div');
@@ -25,9 +45,7 @@
   // Размеры считаем при загрузке и ресайзе, а не на каждом кадре
   const layout = () => {
     H = innerHeight;
-    let y = 0;
-    tops = sections.map((s) => { const t = y; y += s.offsetHeight; return t; });
-    mainH = y;
+    ({ tops, mainH } = App.measureSections());
     footH = footer.offsetHeight;
     docH = document.documentElement.scrollHeight;
     // Высокая секция прилипает нижним краем — иначе её низ никто бы не увидел.
