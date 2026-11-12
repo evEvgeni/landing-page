@@ -800,12 +800,15 @@
   /* Свой курсор: точка и кольцо. Двигаются через transform, на каждом кадре ничего не перерисовывается */
   .cursor-dot, .cursor-ring { position: fixed; left: 0; top: 0; z-index: 2000; pointer-events: none; will-change: transform; transition: opacity .3s; }
   .cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--cursor, var(--giallo)); }
-  .cursor-ring {
-    width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  .cursor-ring { width: 34px; height: 34px; margin: -17px 0 0 -17px; }
+  /* Само кольцо нарисовано внутри и сжимается при нажатии. Если сжимать элемент целиком,
+     scale применяется поверх transform и умножает смещение — кольцо отпрыгивало к углу экрана */
+  .cursor-ring::before {
+    content: ""; position: absolute; inset: 0;
     border: 1.5px solid var(--cursor, var(--giallo)); border-radius: 50%;
-    transition: scale .3s var(--ease), border-color .3s, opacity .3s;
+    transition: scale .3s var(--ease), border-color .3s;
   }
-  .cursor-ring.is-down { scale: .75; }
+  .cursor-ring.is-down::before { scale: .75; }
   .is-cursor-away :is(.cursor-dot, .cursor-ring) { opacity: 0; }
 
   /* Зерно поверх всего сайта — едва заметная «плёнка» */
@@ -951,6 +954,8 @@
   .has-stack main > .section { position: sticky; }
   .has-stack main > .section + .section { border-radius: 2.5rem 2.5rem 0 0; transition: border-radius .4s var(--ease); }
   .has-stack main > .section.is-stuck { border-radius: 0; }
+  /* Пауза после раздела: пустой отрезок прокрутки, который проезжает под прилипшим разделом */
+  .stack-hold { height: 35svh; pointer-events: none; }
   .section__shade { position: absolute; inset: 0; z-index: 20; background: #000; opacity: 0; pointer-events: none; }
 
   /* Занавес: футер лежит под страницей, страница уезжает вверх и открывает его */
@@ -983,4 +988,28 @@
     .grain { display: none; }
     .footer__status i::after { animation: none; }
   }
+}
+
+/* ---------- Переход на страницу проекта: красная заливка карточки разрастается на весь экран ---------- */
+@layer components {
+  .wipe {
+    position: fixed; inset: 0; z-index: 1100;
+    display: flex; flex-direction: column; justify-content: flex-end; gap: 1rem;
+    padding: var(--gutter);
+    background: var(--rosso); color: #fff;
+    pointer-events: none;
+  }
+  .wipe__num { font-weight: 700; letter-spacing: .08em; opacity: .6; }
+  .wipe__title {
+    overflow: clip; padding-bottom: .06em;
+    font-size: clamp(4rem, 13vw, 12rem); font-weight: 800; font-stretch: var(--display-stretch);
+    line-height: .85; letter-spacing: -.02em;
+  }
+  .wipe__title span { display: block; }
+  /* На странице проекта заливка видна, только если пришли из карточки */
+  .wipe--page { display: none; }
+  .is-wiping .wipe--page { display: flex; animation: wipe-out .95s .35s cubic-bezier(.65, 0, .35, 1) both; }
+  .is-wiping .wipe--page .wipe__title span { animation: wipe-title .95s .35s cubic-bezier(.65, 0, .35, 1) both; }
+  @keyframes wipe-out { to { clip-path: inset(0 0 100% 0); } }
+  @keyframes wipe-title { to { transform: translateY(-40%); opacity: 0; } }
 }
