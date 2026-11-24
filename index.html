@@ -61,6 +61,7 @@
     <nav class="nav__links" aria-label="Разделы">
       <a href="#projects">Проекты</a>
       <a href="#skills">Технологии</a>
+      <a href="#learning">Обучение</a>
       <a href="#contacts">Контакты</a>
     </nav>
     <button class="nav__menu" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle>
@@ -74,7 +75,8 @@
       <li><a href="#hero"><small>01</small>Главная</a></li>
       <li><a href="#projects"><small>02</small>Проекты</a></li>
       <li><a href="#skills"><small>03</small>Технологии</a></li>
-      <li><a href="#contacts"><small>04</small>Контакты</a></li>
+      <li><a href="#learning"><small>04</small>Обучение</a></li>
+      <li><a href="#contacts"><small>05</small>Контакты</a></li>
     </ol>
     <p class="menu__foot">hello@example.com</p>
   </div>
@@ -207,7 +209,7 @@
             </div>
           </a>
 
-          <a class="project" href="https://github.com/your-name/review-agent" data-reveal>
+          <a class="project" href="review-agent.html" data-page data-reveal>
             <div class="project__top">
               <div class="project__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/></svg>
@@ -226,7 +228,7 @@
             </div>
           </a>
 
-          <a class="project" href="https://github.com/your-name/research-crew" data-reveal>
+          <a class="project" href="research-crew.html" data-page data-reveal>
             <div class="project__top">
               <div class="project__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -245,7 +247,7 @@
             </div>
           </a>
 
-          <a class="project" href="https://github.com/your-name/ops-autopilot" data-reveal>
+          <a class="project" href="ops-autopilot.html" data-page data-reveal>
             <div class="project__top">
               <div class="project__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
@@ -379,6 +381,27 @@
         </div>
       </div>
     </section>
+
+    <section class="section learning" data-theme="ink" id="learning" data-title="Обучение">
+      <div class="container learning__layout">
+        <header class="learning__intro">
+          <p class="learning__eyebrow" data-reveal>Практический курс · Agent security</p>
+          <h2 class="section__title" data-reveal>Обучение</h2>
+          <p data-reveal>Не просто теория: попробуйте взломать агента, разберитесь в причинах уязвимости и научитесь выстраивать защиту.</p>
+          <a class="btn btn--light learning__button" href="learning.html" data-reveal>Перейти к обучению <span aria-hidden="true">↗</span></a>
+          <small data-reveal>Доступ после оплаты · сейчас демо</small>
+        </header>
+        <div class="learning__course" data-reveal>
+          <div class="learning__course-head"><span>Модуль 01</span><span>3 практических урока</span></div>
+          <h3>Безопасность ИИ-агентов</h3>
+          <ol>
+            <li><span>01</span><p><b>Системный промпт</b><small>Утечка скрытых инструкций и защита данных</small></p><i aria-hidden="true">→</i></li>
+            <li><span>02</span><p><b>Документы и RAG</b><small>Непрямые инъекции через содержимое файлов</small></p><i aria-hidden="true">→</i></li>
+            <li><span>03</span><p><b>MCP-инструменты</b><small>Отравление ответов и строгие схемы данных</small></p><i aria-hidden="true">→</i></li>
+          </ol>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer" data-theme="rosso" id="contacts" data-title="Контакты">
@@ -410,6 +433,7 @@
           <li><a href="#hero">Главная</a></li>
           <li><a href="#projects">Проекты</a></li>
           <li><a href="#skills">Технологии</a></li>
+          <li><a href="#learning">Обучение</a></li>
           <li><a href="#contacts">Контакты</a></li>
         </ul>
       </div>
@@ -417,9 +441,9 @@
         <h3>Проекты</h3>
         <ul>
           <li><a href="support-agent.html">Support Agent</a></li>
-          <li><a href="https://github.com/your-name/review-agent">Review Agent</a></li>
-          <li><a href="https://github.com/your-name/research-crew">Research Crew</a></li>
-          <li><a href="https://github.com/your-name/ops-autopilot">Ops Autopilot</a></li>
+          <li><a href="review-agent.html">Review Agent</a></li>
+          <li><a href="research-crew.html">Research Crew</a></li>
+          <li><a href="ops-autopilot.html">Ops Autopilot</a></li>
         </ul>
       </div>
       <div class="footer__col">

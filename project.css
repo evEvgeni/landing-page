@@ -314,6 +314,7 @@
 
   /* Кнопки на чёрном: основная красная, при наведении заливается жёлтым */
   .agent .btn { background: var(--rosso); color: #fff; --accent: var(--giallo); --on-accent: var(--ink); }
+  .agent .btn:hover, .agent .btn:focus-visible { color: var(--on-accent); }
   .agent .btn--light { background: #fff; color: var(--ink); }
   .summary__actions { gap: .75rem; }
 
@@ -357,10 +358,50 @@
     .page-project .nav__links { gap: 1rem; font-size: .85rem; }
     .ask { flex-direction: column; }
   }
+
+  /* Пасхалки Review Agent */
+  [data-review-title] { cursor: pointer; }
+  [data-review-title].is-glitch { color: var(--giallo); animation: review-glitch .14s linear 8; text-shadow: .06em 0 var(--rosso), -.06em 0 #fff; }
+  @keyframes review-glitch { 50% { transform: translateX(.06em) skewX(-5deg); } }
+
+  .review-scan { position: fixed; inset: 0; z-index: 940; overflow: hidden; pointer-events: none; }
+  .review-scan::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -25%; height: 22%;
+    border-bottom: 2px solid var(--giallo);
+    background: linear-gradient(transparent, rgb(255 237 0 / .16));
+    box-shadow: 0 1rem 3rem rgb(255 237 0 / .12);
+    animation: review-scan 2.3s var(--ease) both;
+  }
+  @keyframes review-scan { to { transform: translateY(650%); } }
+
+  .approval {
+    position: fixed; inset: 0; z-index: 940; display: grid; place-items: center; overflow: hidden;
+    background: rgb(24 24 24 / .45); backdrop-filter: blur(4px);
+    pointer-events: none; animation: approval-away 3.3s ease both;
+  }
+  .approval__stamp {
+    display: grid; gap: .35rem; padding: 1rem 2.5rem;
+    border: .3rem solid var(--giallo); border-radius: 1rem;
+    background: var(--ink); color: var(--giallo); text-align: center;
+    transform: rotate(-7deg); box-shadow: 0 0 0 .6rem var(--ink), 0 0 0 .75rem var(--giallo);
+    animation: approval-in .65s cubic-bezier(.2, 1.6, .4, 1) both;
+  }
+  .approval__stamp b { font-size: clamp(5rem, 16vw, 12rem); font-stretch: var(--display-stretch); line-height: .8; letter-spacing: -.04em; }
+  .approval__stamp span { font-size: clamp(.75rem, 2vw, 1rem); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .approval > i {
+    position: absolute; left: var(--x); top: -8%; width: .65rem; height: 1.1rem;
+    background: var(--giallo); animation: review-confetti 2.5s var(--delay) ease-in both;
+  }
+  .approval > i:nth-of-type(3n) { background: var(--rosso); }
+  .approval > i:nth-of-type(3n + 1) { background: #fff; }
+  @keyframes approval-in { from { opacity: 0; transform: rotate(-18deg) scale(2.2); } }
+  @keyframes approval-away { 0%, 78% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes review-confetti { to { transform: translateY(120vh) rotate(var(--turn)); } }
 }
 
 @layer motion {
   @media (prefers-reduced-motion: reduce) {
     .live i::after { animation: none; }
+    [data-review-title].is-glitch, .review-scan::before, .approval, .approval__stamp, .approval > i { animation: none; }
   }
 }

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Agent — Евгений Шварц</title>
+  <meta name="description" content="Review Agent: ИИ-ревьюер pull request'ов, который находит ошибки и уязвимости, объясняет риски и предлагает исправления.">
+  <meta name="theme-color" content="#181818">
+  <script>
+    (() => {
+      const d = document.documentElement;
+      d.classList.add('js');
+      let wipe = false;
+      try { wipe = sessionStorage.getItem('wipe') === '1'; sessionStorage.removeItem('wipe'); } catch (e) {}
+      if (wipe && !matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('is-wiping');
+      setTimeout(() => d.classList.remove('is-wiping'), 4000);
+    })();
+  </script>
+  <link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/robotoflex-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/sofiasans-xcond-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css?v=51">
+  <link rel="stylesheet" href="project.css?v=15">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js" defer></script>
+  <script src="js/core.js?v=48" defer></script>
+  <script src="js/cursor.js?v=48" defer></script>
+  <script src="js/server3d.js?v=17" defer></script>
+  <script src="js/review-page.js?v=1" defer></script>
+</head>
+<body class="page-project page-review">
+  <div class="wipe wipe--page" aria-hidden="true">
+    <p class="wipe__num">02</p>
+    <p class="wipe__title"><span>Review Agent</span></p>
+  </div>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav" data-nav data-theme="ink">
+    <a class="nav__logo" href="index.html" aria-label="Евгений Шварц — на главную">
+      <span class="nav__mark" aria-hidden="true"><i></i></span>
+      <span class="nav__name">Шварц<small>agentic engineer</small></span>
+    </a>
+    <nav class="nav__links" aria-label="Навигация">
+      <a href="index.html#projects" data-back>← Все проекты</a>
+      <a href="https://github.com/your-name/review-agent">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="agent" data-theme="ink">
+    <div class="stage" data-stage data-scene-title="REVIEW AGENT" data-scene-code="RACK 02 · CI" data-scene-operator="MAINTAINER">
+      <canvas class="stage__canvas" data-stage-canvas aria-label="3D-модель серверной стойки Review Agent: изменения проходят через модули проверки. Тяните, чтобы вращать, кликните модуль, чтобы выдвинуть его" role="img"></canvas>
+
+      <div class="stage__tip" data-tip hidden><b data-tip-num>01</b><span data-tip-name>Webhook</span></div>
+
+      <div class="stage__tools">
+        <button class="chip" type="button" data-door aria-pressed="true">Дверца открыта</button>
+        <button class="chip" type="button" data-reset>Сбросить вид</button>
+        <button class="chip chip--danger" type="button" data-break data-break-label="Сломать CI">Сломать CI</button>
+      </div>
+      <p class="stage__hint" data-hint>Тяните, чтобы вращать · клик по модулю выдвигает его</p>
+
+      <svg class="stage__fallback" viewBox="0 0 240 360" aria-hidden="true">
+        <rect x="40" y="20" width="160" height="320" rx="6" fill="#222224" stroke="#ffed00" stroke-width="2"/>
+        <g fill="#2c2c2f">
+          <rect x="52" y="44" width="136" height="36" rx="3"/><rect x="52" y="88" width="136" height="36" rx="3"/>
+          <rect x="52" y="132" width="136" height="36" rx="3"/><rect x="52" y="176" width="136" height="36" rx="3"/>
+          <rect x="52" y="220" width="136" height="36" rx="3"/><rect x="52" y="264" width="136" height="36" rx="3"/>
+        </g>
+        <g fill="#ffed00"><circle cx="66" cy="62" r="3"/><circle cx="66" cy="106" r="3"/><circle cx="66" cy="150" r="3"/><circle cx="66" cy="194" r="3"/><circle cx="66" cy="238" r="3"/></g>
+        <circle cx="66" cy="282" r="3" fill="#dc0000"/>
+      </svg>
+    </div>
+
+    <div class="summary">
+      <header class="summary__head" data-reveal>
+        <h1 class="summary__title" data-review-title>Review Agent</h1>
+        <span class="live" data-live><i aria-hidden="true"></i><span data-live-text>Следит за PR</span></span>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="Разделы сводки" data-tabs data-reveal>
+        <button class="tab" type="button" role="tab" id="tab-about" aria-controls="panel-about" aria-selected="true">Обзор</button>
+        <button class="tab" type="button" role="tab" id="tab-flow" aria-controls="panel-flow" aria-selected="false" tabindex="-1">Как устроен</button>
+        <button class="tab" type="button" role="tab" id="tab-ask" aria-controls="panel-ask" aria-selected="false" tabindex="-1">Проверить код</button>
+      </div>
+
+      <div class="panels" data-reveal>
+        <section class="panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about">
+          <p class="summary__lead">Проверяет pull request'ы: находит ошибки и&nbsp;уязвимости, объясняет риски и&nbsp;предлагает готовые исправления.<span class="summary__lead-more"> Спорные изменения передаёт мейнтейнеру с понятным отчётом.</span></p>
+
+          <dl class="kpis">
+            <div class="kpi kpi--accent">
+              <dt>замечаний по делу</dt>
+              <dd><b data-count="94">94</b><span>%</span></dd>
+            </div>
+            <div class="kpi">
+              <dt>до первого ревью</dt>
+              <dd><b data-count="42">42</b><span>с</span></dd>
+            </div>
+            <div class="kpi">
+              <dt>PR проверено</dt>
+              <dd><b data-count="1480">1 480</b></dd>
+            </div>
+            <div class="kpi">
+              <dt>языков в анализе</dt>
+              <dd><b data-count="8">8</b></dd>
+            </div>
+          </dl>
+
+          <div class="live-box" data-rate="0.94">
+            <p class="live-box__title"><b>Ревью сейчас</b><span>симуляция с момента открытия страницы</span></p>
+            <dl class="counters">
+              <div><dt>Проверено</dt><dd data-stat="total">0</dd></div>
+              <div><dt><i class="dot dot--ok" aria-hidden="true"></i>Агентом</dt><dd data-stat="closed">0</dd></div>
+              <div><dt><i class="dot dot--human" aria-hidden="true"></i>Мейнтейнеру</dt><dd data-stat="human">0</dd></div>
+              <div><dt>Без человека</dt><dd data-stat="rate">—</dd></div>
+            </dl>
+            <i class="ratio" aria-hidden="true"><i data-stat-bar></i></i>
+          </div>
+
+          <ul class="stack" aria-label="Стек">
+            <li>TypeScript</li><li>Claude</li><li>GitHub API</li><li>Tree-sitter</li><li>Semgrep</li><li>Node.js</li><li>Vitest</li><li>Docker</li>
+          </ul>
+        </section>
+
+        <section class="panel" id="panel-flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
+          <ol class="modules" data-modules>
+            <li><button class="module" type="button" data-module="0" data-module-sub="PULL REQUEST · DIFF" aria-expanded="false">
+            <span class="module__num">01</span>
+            <span class="module__name">Webhook</span>
+            <span class="module__code">GITHUB WEBHOOK</span>
+            <span class="module__more"><span class="module__inner">
+              <span class="module__desc">Ловит открытие и обновление pull request, проверяет подпись события и загружает только изменённые файлы.</span>
+              <span class="module__stats"><span>Задержка <b>~60 мс</b></span><span>Нагрузка <b data-load>0%</b></span></span>
+            </span></span>
+            </button></li>
+            <li><button class="module" type="button" data-module="1" data-module-sub="AST · DEPENDENCIES" aria-expanded="false">
+            <span class="module__num">02</span>
+            <span class="module__name">Контекст</span>
+            <span class="module__code">CONTEXT BUILDER</span>
+            <span class="module__more"><span class="module__inner">
+              <span class="module__desc">Строит карту зависимостей, подтягивает соседние функции и тесты, чтобы оценивать diff в контексте всего проекта.</span>
+              <span class="module__stats"><span>Задержка <b>~240 мс</b></span><span>Нагрузка <b data-load>0%</b></span></span>
+            </span></span>
+            </button></li>
+            <li><button class="module" type="button" data-module="2" data-module-sub="TYPES · CONTROL FLOW" aria-expanded="false">
+            <span class="module__num">03</span>
+            <span class="module__name">Анализ кода</span>
+            <span class="module__code">STATIC ANALYSIS</span>
+            <span class="module__more"><span class="module__inner">
+              <span class="module__desc">Tree-sitter и Semgrep проверяют типы, граничные случаи и поток данных до запуска языковой модели.</span>
+              <span class="module__stats"><span>Задержка <b>~480 мс</b></span><span>Нагрузка <b data-load>0%</b></span></span>
+            </span></span>
+            </button></li>
+            <li><button class="module" type="button" data-module="3" data-module-sub="SECRETS · INJECTION" aria-expanded="false">
+            <span class="module__num">04</span>
+            <span class="module__name">Безопасность</span>
+            <span class="module__code">SECURITY SCAN</span>
+            <span class="module__more"><span class="module__inner">
+              <span class="module__desc">Ищет утечки токенов, инъекции и небезопасные вызовы. Критические находки блокируют автоматический approve.</span>
+              <span class="module__stats"><span>Задержка <b>~190 мс</b></span><span>Нагрузка <b data-load>0%</b></span></span>
+            </span></span>
+            </button></li>
+            <li><button class="module" type="button" data-module="4" data-module-sub="CLAUDE · PATCHES" aria-expanded="false">
+            <span class="module__num">05</span>
+            <span class="module__name">Ревью и патчи</span>
+            <span class="module__code">LLM REVIEW</span>
+            <span class="module__more"><span class="module__inner">
+              <span class="module__desc">Отбрасывает дубли и спорные замечания, объясняет последствия и формирует компактный патч для каждой находки.</span>
+              <span class="module__stats"><span>Задержка <b>~2,1 с</b></span><span>Нагрузка <b data-load>0%</b></span></span>
+            </span></span>
+            </button></li>
+            <li><button class="module" type="button" data-module="5" data-module-sub="HUMAN IN THE LOOP" aria-expanded="false">
+            <span class="module__num">06</span>
+            <span class="module__name">Мейнтейнеру</span>
+            <span class="module__code">HANDOFF</span>
+            <span class="module__more"><span class="module__inner">
+              <span class="module__desc">Архитектурные и неоднозначные решения уходят человеку вместе с контекстом, рисками и вариантами исправления.</span>
+              <span class="module__stats"><span>Задержка <b>~25 мс</b></span><span>Нагрузка <b data-load>0%</b></span></span>
+            </span></span>
+            </button></li>
+          </ol>
+        </section>
+
+        <section class="panel" id="panel-ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
+          <form class="ask" data-ask>
+            <label class="sr-only" for="ask-input">Фрагмент кода для проверки</label>
+            <input class="ask__input" id="ask-input" name="q" type="text" maxlength="180" autocomplete="off" placeholder="Например: eval(userInput)" required>
+            <button class="btn ask__send" type="submit">Проверить</button>
+          </form>
+          <div class="presets" data-presets>
+            <button class="chip" type="button">eval(userInput)</button>
+            <button class="chip" type="button">if (role == "admin")</button>
+            <button class="chip" type="button">const user = users[0]</button>
+            <button class="chip" type="button">Проверь весь PR с человеком</button>
+          </div>
+          <div class="run">
+            <ol class="steps" data-steps aria-hidden="true">
+              <li>Webhook</li><li>Контекст</li><li>Анализ</li><li>Защита</li><li>Ревью</li><li>Человек</li>
+            </ol>
+            <p class="run__q" data-question hidden></p>
+            <p class="run__status" data-status aria-live="polite">Отправьте фрагмент кода — огонёк на стойке покажет путь проверки.</p>
+            <div class="run__answer" data-answer hidden></div>
+            <div class="history" data-history hidden>
+              <p class="history__title">Ранее</p>
+              <ol class="history__list" data-history-list></ol>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="actions summary__actions" data-reveal>
+        <a class="btn" href="https://github.com/your-name/review-agent">Код на GitHub</a>
+        <a class="btn btn--light" href="index.html#contacts">Обсудить похожего агента</a>
+      </div>
+    </div>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast></div>
+</body>
+</html>
