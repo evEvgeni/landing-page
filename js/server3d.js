@@ -1,10 +1,13 @@
-// 3D-сцена страницы Support Agent: серверная стойка, в которой работает агент.
-// Обращения-пакеты приходят по кабелю сверху, спускаются по световоду и останавливаются в модулях-агентах.
+// 3D-сцена страниц проектов: серверная стойка, в которой работает агент.
+// Пакеты приходят по кабелю сверху, спускаются по световоду и останавливаются в модулях-агентах.
 // Закрытые агентом уходят жёлтыми по кабелю вправо, сложные — красными к пульту оператора слева.
-// Наружу отдаёт App.server: выбор и подсветка модулей, отправка своего обращения, события для сводки.
+// Наружу отдаёт App.server: выбор и подсветка модулей, отправка своего пакета, события для сводки.
 (() => {
   const stage = document.querySelector('[data-stage]');
   if (!stage) return;
+  const sceneTitle = stage.dataset.sceneTitle || 'SUPPORT AGENT';
+  const sceneCode = stage.dataset.sceneCode || 'RACK 01 · PROD';
+  const sceneOperator = stage.dataset.sceneOperator || 'OPERATOR';
   const canvas = stage.querySelector('[data-stage-canvas]');
   const fail = () => stage.classList.add('is-fallback');
   if (!window.THREE) return fail();
@@ -117,9 +120,9 @@
       ctx.fillStyle = err ? '#4a0000' : '#141416'; ctx.fillRect(0, 0, w, h);
       ctx.textAlign = 'left';
       font(ctx, 800, 64); ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle';
-      ctx.fillText(err ? 'SYSTEM FAILURE' : 'SUPPORT AGENT', 24, h / 2 + 4);
+      ctx.fillText(err ? 'SYSTEM FAILURE' : sceneTitle, 24, h / 2 + 4);
       font(ctx, 700, 34); ctx.fillStyle = err ? '#ff5a5a' : '#ffed00'; ctx.textAlign = 'right';
-      ctx.fillText(err ? 'ERR 500 · DUCK ON IT' : 'RACK 01 · PROD', w - 24, h / 2 + 2);
+      ctx.fillText(err ? 'ERR 500 · DUCK ON IT' : sceneCode, w - 24, h / 2 + 2);
     }),
   }));
   plate.position.set(0, 4.16, D / 2 - 0.08);
@@ -145,8 +148,10 @@
   box(0.03, 3.5, 0.03, busMat, BUS.x, 2.32, BUS.z).castShadow = false;
 
   // ---------- Модули ----------
-  const CODES = ['GATEWAY', 'CLASSIFIER', 'RAG SEARCH', 'MEMORY · PG', 'RESPONDER', 'HANDOFF'];
-  const SUBS = ['INGRESS · PII FILTER', 'TOPIC · URGENCY', 'HYBRID · RERANK', 'POSTGRES · PGVECTOR', 'LLM · GUARDRAILS', 'HUMAN IN THE LOOP'];
+  const moduleNodes = [...document.querySelectorAll('[data-module]')];
+  const DEFAULT_SUBS = ['INGRESS · PII FILTER', 'TOPIC · URGENCY', 'HYBRID · RERANK', 'POSTGRES · PGVECTOR', 'LLM · GUARDRAILS', 'HUMAN IN THE LOOP'];
+  const CODES = moduleNodes.map((el) => el.querySelector('.module__code')?.textContent || 'MODULE');
+  const SUBS = moduleNodes.map((el, i) => el.dataset.moduleSub || DEFAULT_SUBS[i] || 'AGENT · ONLINE');
   const FW = 2.14, FH = UH - 0.03;
   // Перевод координат текстуры лицевой панели (1024×224) в метры
   const px = (x) => (x / 1024 - 0.5) * FW;
@@ -161,7 +166,10 @@
     font(ctx, 700, 30); ctx.fillStyle = i === 5 ? '#ff3b3b' : '#ffed00';
     ctx.fillText(String(i + 1).padStart(2, '0'), 92, 70);
     font(ctx, 800, 66); ctx.fillStyle = '#ffffff';
-    ctx.fillText(CODES[i], 92, 138);
+    const codeWidth = 330;
+    const codeSize = Math.min(66, 66 * codeWidth / ctx.measureText(CODES[i]).width);
+    font(ctx, 800, Math.max(30, codeSize));
+    ctx.fillText(CODES[i], 92, 138, codeWidth);
     font(ctx, 600, 22); ctx.fillStyle = 'rgba(255,255,255,.45)';
     ctx.fillText(SUBS[i], 92, 178);
     // гнёзда светодиодов и порты
@@ -284,7 +292,7 @@
     ctx.beginPath(); ctx.arc(w / 2, 118, 44, 0, 7); ctx.fill();
     ctx.beginPath(); ctx.ellipse(w / 2, 238, 86, 58, 0, Math.PI, 0); ctx.fill();
     font(ctx, 800, 40); ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-    ctx.fillText('OPERATOR', w / 2, 296);
+    ctx.fillText(sceneOperator, w / 2, 296);
   });
   const screen = new T.Mesh(new T.PlaneGeometry(0.86, 0.54), new T.MeshBasicMaterial({ map: screenTex, color: 0x777777 }));
   screen.position.set(0, 1.25, 0.056);
@@ -989,6 +997,13 @@
     },
     reset() { api.select(-1); view.pitch = 0; view.vel = 0; idle = 10; if (!doorOpen) api.toggleDoor(); },
     send(opts) { return spawn({ ...opts, user: true }); },
+    celebrate() {
+      if (fx.broken) return;
+      modules.forEach((m, i) => setTimeout(() => (m.flash = 1), i * 90));
+      for (let i = 0; i < 10; i++) setTimeout(() => spawn({ escalate: false }), i * 100);
+      if (!still) view.vel += 0.16;
+      idle = -3;
+    },
     load: (i) => modules[i]?.load || 0,
   };
   App.server = api;
